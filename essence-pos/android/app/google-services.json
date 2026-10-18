@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "976460236198",
+    "project_id": "essenceisb",
+    "storage_bucket": "essenceisb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976460236198:android:45dd248b1cd965e2ff7b67",
+        "android_client_info": {
+          "package_name": "com.nibnox.essence_pos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgTI4kvchEdWrXiR7vKFHYnC849-Fd7aQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,35 @@
+{
+    "name": "Essence Dashboard",
+    "short_name": "Essence",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#F9F5EC",
+    "theme_color": "#4E5726",
+    "description": "Live sales, cash, stock and terminals for Essence café — updated in real time from every till.",
+    "orientation": "any",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
