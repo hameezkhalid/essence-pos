@@ -118,7 +118,8 @@ function apply(live: Live) {
   const away = !seen || Date.now() - seen > INTAKE_STALE_MS;
   status = {
     open: !!s?.accepting && !away,
-    reason: !s ? 'unknown' : !s.accepting ? 'paused' : away ? 'away' : undefined,
+    // No store info yet means no till has switched online ordering on.
+    reason: !s?.accepting ? 'paused' : away ? 'away' : undefined,
     whatsapp: s?.whatsapp || site.whatsapp,
     hours: s?.hours || site.hours,
     address: s?.address || site.address,

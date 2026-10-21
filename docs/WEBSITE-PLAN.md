@@ -262,4 +262,4 @@ Add specific `match` blocks. These are combined with the existing member wildcar
   - fill the TODO placeholders in `essence-website/src/site.config.ts`
   - swap in hi-res photos.
 
-**Hosting change (2026-10-21, user decision):** the website takes the default site, https://essenceisb.web.app. The admin panel moves to a new site, https://essence-admin.web.app (`essence-pos/firebase.json`: `"site": "essence-admin"`). Credit "Powered by Nibnox (SMC-Private) Ltd." (links to nibnox.com) added to the website footer and the POS receipt.
+**Hosting change (2026-10-21, user decision):** the website takes the default site, https://essenceisb.web.app. The admin panel moves to a new site, https://essenceisb-admin.web.app (`essence-pos/firebase.json`: `"site": "essenceisb-admin"`; `essence-admin` was taken globally). Credit "Powered by Nibnox (SMC-Private) Ltd." (links to nibnox.com) added to the website footer and the POS receipt.
