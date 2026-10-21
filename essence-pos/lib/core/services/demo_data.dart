@@ -33,7 +33,7 @@ class DemoData {
         ntn: '0000000-0',
         strn: '00-00-0000-000-00',
       ),
-      fbr: const FbrSettings(enabled: true, mode: FbrMode.mock, posId: '137284'),
+      fbr: const FbrSettings(),
     );
     final settingsRepo = SettingsRepo(db);
     await settingsRepo.saveAll(settings);

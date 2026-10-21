@@ -1,12 +1,12 @@
 # Essence POS — Architecture & conventions
 
-Flutter app (Windows desktop first, also macOS for development, Android tablets, and a web build that is the owner's live dashboard). Firebase project `essenceisb`, store id `essence`.
+Flutter app. Windows (and macOS/Android) builds are the till; the web build is the admin panel — the same app with a Dashboard and Menu tab first (`lib/app/platform.dart`: `adminPanel = kIsWeb`). Firebase project `essenceisb`, store id `essence`.
 
 ## Layers
 
 ```
 lib/
-  main.dart                 web → DashboardApp, everything else → BootApp
+  main.dart                 BootApp everywhere (web = admin panel, see app/platform.dart)
   app/
     boot.dart               Firebase + SQLite start-up, sign-in, terminal setup, BootActions (sign out, reset demo, clear sales)
     services.dart           AppServices: one object holding every service for a running terminal
@@ -22,7 +22,7 @@ lib/
     fiscal/                 FiscalAdapter (MockFbrAdapter now, FbrImsAdapter later) + FiscalQueue
   shared/                   reusable widgets: common.dart, keypads.dart, receipt_preview.dart, approval.dart
   features/<feature>/       screens
-  dashboard/                web owner dashboard (reads Firestore directly)
+  dashboard/                live owner dashboard tab (reads Firestore directly)
 ```
 
 ## Rules

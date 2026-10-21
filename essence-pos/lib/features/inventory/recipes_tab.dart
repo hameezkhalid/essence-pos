@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../shared/product_thumb.dart';
 import '../../app/providers.dart';
-import '../../app/theme/icons.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/db/database.dart';
 import '../../core/models/menu_models.dart';
@@ -213,7 +213,7 @@ class _ProductRow extends StatelessWidget {
           child: LayoutBuilder(builder: (context, c) {
             final wide = c.maxWidth >= 720;
             final head = Row(children: [
-              IconBadge(icon: iconFor(p.icon), color: Color(p.color)),
+              ProductThumb(product: p),
               const SizedBox(width: Sp.md),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/platform.dart';
 import '../../app/providers.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/models/menu_models.dart';
@@ -25,7 +26,7 @@ class NavItem {
   final Perm? perm;
 }
 
-const navItems = [
+const _tillNav = [
   NavItem('/sell', 'Sell', Icons.point_of_sale_outlined, Icons.point_of_sale_rounded),
   NavItem('/orders', 'Orders', Icons.receipt_long_outlined, Icons.receipt_long_rounded),
   NavItem('/shift', 'Shift', Icons.schedule_outlined, Icons.schedule_rounded),
@@ -33,6 +34,20 @@ const navItems = [
   NavItem('/reports', 'Reports', Icons.insights_outlined, Icons.insights_rounded, perm: Perm.viewReports),
   NavItem('/settings', 'Settings', Icons.tune_outlined, Icons.tune_rounded),
 ];
+
+/// Web admin panel: the dashboard and menu first, plus the same POS screens as the till.
+const _adminNav = [
+  NavItem('/dashboard', 'Dashboard', Icons.space_dashboard_outlined, Icons.space_dashboard_rounded, perm: Perm.viewReports),
+  NavItem('/sell', 'POS', Icons.point_of_sale_outlined, Icons.point_of_sale_rounded),
+  NavItem('/menu', 'Menu', Icons.restaurant_menu_outlined, Icons.restaurant_menu_rounded, perm: Perm.manageMenu),
+  NavItem('/orders', 'Orders', Icons.receipt_long_outlined, Icons.receipt_long_rounded),
+  NavItem('/inventory', 'Inventory', Icons.inventory_2_outlined, Icons.inventory_2_rounded),
+  NavItem('/reports', 'Reports', Icons.insights_outlined, Icons.insights_rounded, perm: Perm.viewReports),
+  NavItem('/shift', 'Shift', Icons.schedule_outlined, Icons.schedule_rounded),
+  NavItem('/settings', 'Settings', Icons.tune_outlined, Icons.tune_rounded),
+];
+
+const navItems = adminPanel ? _adminNav : _tillNav;
 
 /// Main layout: navigation rail (desktop/tablet) or bottom bar (phone) + top bar.
 class AppShell extends ConsumerStatefulWidget {
@@ -93,7 +108,8 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   Future<void> _maybeAskShift() async {
-    if (_askedShift || !mounted) return;
+    // The admin panel asks for a shift only when someone charges a sale.
+    if (_askedShift || !mounted || adminPanel) return;
     _askedShift = true;
     final s = ref.read(settingsValueProvider);
     if (!s.security.requireOpenShift) return;
@@ -139,16 +155,7 @@ class _AppShellState extends ConsumerState<AppShell> {
                   Expanded(child: content),
                 ]),
         ),
-        bottomNavigationBar: phone
-            ? NavigationBar(
-                selectedIndex: index,
-                onDestinationSelected: (i) => context.go(items[i].path),
-                labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-                destinations: [
-                  for (final n in items) NavigationDestination(icon: Icon(n.icon), selectedIcon: Icon(n.selectedIcon), label: n.label),
-                ],
-              )
-            : null,
+        bottomNavigationBar: phone ? _PhoneNav(items: items, index: index) : null,
       ),
     );
   }
@@ -313,6 +320,58 @@ class _TopBar extends ConsumerWidget {
             ),
           ),
       ]),
+    );
+  }
+}
+
+/// Bottom bar on phones; with more than five sections the rest go under "More".
+class _PhoneNav extends StatelessWidget {
+  const _PhoneNav({required this.items, required this.index});
+  final List<NavItem> items;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    const maxShown = 5;
+    final overflow = items.length > maxShown;
+    final shown = overflow ? items.take(maxShown - 1).toList() : items;
+    final rest = overflow ? items.skip(maxShown - 1).toList() : const <NavItem>[];
+    final inRest = index >= shown.length;
+    return NavigationBar(
+      selectedIndex: inRest ? shown.length : index,
+      onDestinationSelected: (i) {
+        if (i < shown.length) {
+          context.go(shown[i].path);
+          return;
+        }
+        showModalBottomSheet<void>(
+          context: context,
+          builder: (ctx) => SafeArea(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              for (final n in rest)
+                ListTile(
+                  leading: Icon(n.icon),
+                  title: Text(n.label),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    context.go(n.path);
+                  },
+                ),
+              const SizedBox(height: Sp.md),
+            ]),
+          ),
+        );
+      },
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+      destinations: [
+        for (final n in shown) NavigationDestination(icon: Icon(n.icon), selectedIcon: Icon(n.selectedIcon), label: n.label),
+        if (overflow)
+          NavigationDestination(
+            icon: const Icon(Icons.more_horiz_rounded),
+            selectedIcon: Icon(inRest ? items[index].selectedIcon : Icons.more_horiz_rounded),
+            label: inRest ? items[index].label : 'More',
+          ),
+      ],
     );
   }
 }

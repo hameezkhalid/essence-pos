@@ -216,7 +216,7 @@ class DiscountSettings {
 class ReceiptSettings {
   const ReceiptSettings({
     this.header = '',
-    this.footer = 'Thank you for visiting Essence!\nFollow us @essence',
+    this.footer = 'Thank you for visiting Essence!',
     this.showLogo = true,
     this.showTaxBreakdown = true,
     this.showCashier = true,
@@ -257,28 +257,39 @@ class ReceiptSettings {
 }
 
 enum FbrMode {
-  mock('Demo (simulated)'),
-  sandbox('FBR Sandbox'),
+  sandbox('FBR Sandbox (testing)'),
   live('FBR Live');
 
   const FbrMode(this.label);
   final String label;
-  static FbrMode parse(String? v) => FbrMode.values.firstWhere((m) => m.name == v, orElse: () => FbrMode.mock);
+  static FbrMode parse(String? v) => v == 'sandbox' ? FbrMode.sandbox : FbrMode.live;
 }
 
+/// FBR POS integration. When [enabled] is off, sales skip FBR entirely: no FBR fee,
+/// no fiscal invoice number and nothing is queued for reporting.
 class FbrSettings {
-  const FbrSettings({this.enabled = true, this.mode = FbrMode.mock, this.posId = '', this.token = ''});
+  const FbrSettings({this.enabled = false, this.mode = FbrMode.live, this.posId = '', this.token = '', this.pctCode = ''});
   final bool enabled;
   final FbrMode mode;
+
+  /// POS ID issued by FBR for this outlet.
   final String posId;
+
+  /// Security token issued by FBR (sent as a Bearer token).
   final String token;
 
-  Map<String, dynamic> toJson() => {'enabled': enabled, 'mode': mode.name, 'posId': posId, 'token': token};
+  /// Default PCT (HS) code reported for items.
+  final String pctCode;
+
+  bool get hasCredentials => posId.trim().isNotEmpty && token.trim().isNotEmpty;
+
+  Map<String, dynamic> toJson() => {'enabled': enabled, 'mode': mode.name, 'posId': posId, 'token': token, 'pctCode': pctCode};
   static FbrSettings fromJson(Map j) => FbrSettings(
-        enabled: _b(j, 'enabled', true),
+        enabled: _b(j, 'enabled', false),
         mode: FbrMode.parse(j['mode'] as String?),
         posId: _s(j, 'posId', ''),
         token: _s(j, 'token', ''),
+        pctCode: _s(j, 'pctCode', ''),
       );
 }
 

@@ -19,8 +19,9 @@ class FbrSection extends ConsumerStatefulWidget {
 class _FbrSectionState extends SettingsFormState<FbrSection> {
   late final _posId = ctrl();
   late final _token = ctrl();
-  bool _enabled = true;
-  FbrMode _mode = FbrMode.mock;
+  late final _pct = ctrl();
+  bool _enabled = false;
+  FbrMode _mode = FbrMode.live;
   bool _reveal = false;
   bool _reporting = false;
   late final Stream<Map<String, int>> _counts;
@@ -33,7 +34,7 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
   }
 
   FbrSettings get _saved => ref.read(settingsValueProvider).fbr;
-  FbrSettings get _draft => FbrSettings(enabled: _enabled, mode: _mode, posId: _posId.text.trim(), token: _token.text.trim());
+  FbrSettings get _draft => FbrSettings(enabled: _enabled, mode: _mode, posId: _posId.text.trim(), token: _token.text.trim(), pctCode: _pct.text.trim());
 
   @override
   List<ProviderListenable<Object?>> get sources => [settingsValueProvider];
@@ -51,6 +52,7 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
     _mode = s.mode;
     setText(_posId, s.posId);
     setText(_token, s.token);
+    setText(_pct, s.pctCode);
   }
 
   @override
@@ -81,8 +83,8 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
     final ec = context.ec;
     final online = (ref.watch(syncStatusProvider).value ?? const SyncStatus()).online;
     return SettingsScaffold(
-      title: 'FBR integration',
-      subtitle: 'Reports every sale to FBR and prints the FBR invoice number and QR code on the receipt.',
+      title: 'FBR invoices',
+      subtitle: 'Report every sale to FBR and print the FBR invoice number and QR code on the receipt.',
       formKey: formKey,
       onSave: save,
       footer: saveBar(),
@@ -92,30 +94,37 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
           icon: Icons.verified_outlined,
           children: [
             LabeledSwitch(
-              title: 'Report sales to FBR',
-              subtitle: _enabled ? 'Receipts print as sales tax invoices with an FBR number' : 'Receipts print as plain sales receipts; no FBR POS fee is charged',
+              title: 'FBR invoices',
+              subtitle: _enabled
+                  ? 'On — each sale is reported to FBR; receipts are sales tax invoices with the FBR number, QR code and FBR POS fee.'
+                  : 'Off — FBR is bypassed: plain sales receipts, no FBR POS fee, nothing reported. Sales made while off are never sent to FBR.',
               value: _enabled,
               onChanged: (v) => setState(() => _enabled = v),
             ),
             const SizedBox(height: Sp.md),
-            Text('Mode', style: context.tt.titleSmall),
+            Text('Environment', style: context.tt.titleSmall),
             const SizedBox(height: Sp.sm),
             Segments<FbrMode>(
               values: FbrMode.values,
               selected: _mode,
               enabled: _enabled,
-              minWidth: 420,
-              label: (m) => switch (m) { FbrMode.mock => 'Demo (simulated)', FbrMode.sandbox => 'Sandbox', FbrMode.live => 'Live' },
+              minWidth: 360,
+              label: (m) => switch (m) { FbrMode.sandbox => 'Sandbox (testing)', FbrMode.live => 'Live' },
               onChanged: (m) => setState(() => _mode = m),
             ),
             const SizedBox(height: Sp.sm),
-            if (_mode == FbrMode.mock)
-              Text('Invoices get realistic simulated FBR numbers. Nothing is sent to FBR.', style: context.tt.bodySmall)
-            else
+            if (_enabled && (_posId.text.trim().isEmpty || _token.text.trim().isEmpty))
               const InfoBanner(
-                'Real FBR reporting is added after the demo, once FBR issues the POS ID and token.',
+                'Enter the POS ID and token from FBR below. Until then invoices wait in the queue and receipts say “FBR invoice pending”.',
                 tone: Tone.warning,
-                icon: Icons.construction_rounded,
+                icon: Icons.key_off_outlined,
+              )
+            else
+              Text(
+                _mode == FbrMode.live
+                    ? 'Live: invoices go to FBR’s production system (gw.fbr.gov.pk).'
+                    : 'Sandbox: invoices go to FBR’s test system and are not real tax records.',
+                style: context.tt.bodySmall,
               ),
           ],
         ),
@@ -126,14 +135,12 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
           children: [
             TextFormField(
               controller: _posId,
-              enabled: _enabled,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(labelText: 'POS ID', hintText: 'e.g. 137284'),
             ),
             fieldGap,
             TextFormField(
               controller: _token,
-              enabled: _enabled,
               obscureText: !_reveal,
               autocorrect: false,
               enableSuggestions: false,
@@ -147,6 +154,16 @@ class _FbrSectionState extends SettingsFormState<FbrSection> {
                 ),
               ),
               onFieldSubmitted: (_) => save(),
+            ),
+            fieldGap,
+            TextFormField(
+              controller: _pct,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'PCT code',
+                hintText: 'As advised by FBR / your tax consultant',
+                helperText: 'Harmonised (PCT) code reported for each item.',
+              ),
             ),
           ],
         ),

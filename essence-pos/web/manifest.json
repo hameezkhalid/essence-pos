@@ -1,11 +1,11 @@
 {
-    "name": "Essence Dashboard",
+    "name": "Essence Admin",
     "short_name": "Essence",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F9F5EC",
     "theme_color": "#4E5726",
-    "description": "Live sales, cash, stock and terminals for Essence café — updated in real time from every till.",
+    "description": "Admin panel for Essence café: live dashboard, menu management and the POS.",
     "orientation": "any",
     "prefer_related_applications": false,
     "icons": [

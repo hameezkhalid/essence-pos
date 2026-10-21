@@ -9,7 +9,7 @@ import '../../app/theme/tokens.dart';
 import '../../core/sync/sync_engine.dart';
 import '../../shared/common.dart';
 
-/// Online / offline / syncing indicator. Tap for details and the demo "go offline" switch.
+/// Online / offline / syncing indicator. Tap for details.
 class SyncPill extends ConsumerWidget {
   const SyncPill({super.key, this.compact = false});
   final bool compact;
@@ -98,15 +98,7 @@ class SyncDetailsDialog extends ConsumerWidget {
                 decoration: BoxDecoration(color: ec.warningContainer, borderRadius: BorderRadius.circular(Rad.md)),
                 child: Text(s.error!, style: context.tt.bodySmall?.copyWith(color: ec.warning)),
               ),
-            const Divider(height: Sp.xl),
-            LabeledSwitch(
-              title: 'Work offline (demo)',
-              subtitle: 'Simulates an internet outage. Sales keep working and save on this device; '
-                  'they upload in order — with no duplicates — when you switch back.',
-              value: s.forcedOffline,
-              onChanged: (v) => svc.sync.setForcedOffline(v),
-            ),
-            const SizedBox(height: Sp.sm),
+            const SizedBox(height: Sp.md),
             Text('Sales are always saved on this computer first, so the till never waits for the internet.', style: context.tt.bodySmall),
           ]),
         ),

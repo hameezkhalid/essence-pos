@@ -7,7 +7,10 @@ import 'package:essence_pos/core/models/cart.dart';
 import 'package:essence_pos/core/models/menu_models.dart';
 import 'package:essence_pos/core/models/order_models.dart';
 import 'package:essence_pos/core/printing/printer_service.dart';
+import 'package:essence_pos/core/fiscal/fiscal.dart';
+import 'package:essence_pos/core/models/settings_models.dart';
 import 'package:essence_pos/core/services/demo_data.dart';
+import 'package:essence_pos/core/services/repos.dart';
 import 'package:essence_pos/core/services/inventory_service.dart';
 import 'package:essence_pos/core/services/pos_context.dart';
 import 'package:essence_pos/core/services/pos_service.dart';
@@ -124,11 +127,11 @@ void main() {
     );
     expect(order.status, OrderStatus.paid);
     expect(order.number, startsWith('ESS-T1-'));
-    expect(order.fiscalStatus, 'pending');
-    // Large latte 650+150 + oat 150 = 950; 2 croissants 1100 → 2050 + 15% GST 307.5→308 + Re 1 fee
+    expect(order.fiscalStatus, 'none', reason: 'FBR invoices are off by default');
+    // Large latte 650+150 + oat 150 = 950; 2 croissants 1100 → 2050 + 15% GST 307.5→308 (no FBR fee while FBR is off)
     expect(order.itemsGross, 205000);
     expect(order.taxTotal, 30800);
-    expect(order.total, 205000 + 30800 + 100);
+    expect(order.total, 205000 + 30800);
     expect(order.payments.single.change, 300000 - order.total);
 
     final after = await db.stockLevels();
@@ -137,6 +140,31 @@ void main() {
     expect(before['oat']! - after['oat']!, closeTo(220 * 1.3, 0.001));
     expect(after['milk'], before['milk']);
     expect(before['dough']! - after['dough']!, 2);
+  });
+
+  test('FBR invoices on: fee charged, invoice queued, payload adds up', () async {
+    await SettingsRepo(db).save(SettingKeys.fbr, const FbrSettings(enabled: true, posId: '123456', token: 't', pctCode: '19059090').toJson());
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    final products = {for (final p in await db.select(db.products).get()) p.id: p};
+    final order = await pos.checkout(
+      cart: CartState(lines: [lineFor(products['croissant']!, qty: 2), lineFor(products['americano']!, size: 'M')]),
+      portions: const [PaymentPortionInput(methodId: 'card', methodName: 'Card', group: RateGroup.cardOnline)],
+      tenderedByPortion: const {},
+      staff: await cashier(),
+      shift: null,
+    );
+    expect(order.fiscalStatus, 'pending');
+    expect(order.fbrFee, 100);
+    final p = fbrInvoicePayload(order, ctx.settings.fbr);
+    expect(p['POSID'], 123456);
+    expect(p['USIN'], order.number);
+    expect(p['PaymentMode'], 2);
+    final items = (p['Items'] as List).cast<Map<String, dynamic>>();
+    double sum(String k) => items.fold<double>(0, (a, i) => a + (i[k] as num));
+    expect(sum('TaxCharged'), closeTo(p['TotalTaxCharged'] as double, 0.001));
+    expect(sum('SaleValue'), closeTo(p['TotalSaleValue'] as double, 0.001));
+    expect(p['TotalBillAmount'], closeTo((order.total - order.fbrFee) / 100, 0.001));
+    expect(items.first['PCTCode'], '19059090');
   });
 
   test('refund returns stock and marks the order; void restores everything', () async {

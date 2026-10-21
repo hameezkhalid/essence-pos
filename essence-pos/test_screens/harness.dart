@@ -43,8 +43,6 @@ class FakeBoot implements BootActions {
   @override
   Future<void> renameTerminal(String name, String code) async {}
   @override
-  Future<String?> resetDemoData(void Function(String step) onStep) async => null;
-  @override
   Future<String?> signOut() async => null;
 }
 

@@ -23,15 +23,11 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   StaffMember? _selected;
   late Timer _clock;
   DateTime _now = DateTime.now();
-  bool _demo = false;
 
   @override
   void initState() {
     super.initState();
     _clock = Timer.periodic(const Duration(seconds: 15), (_) => setState(() => _now = DateTime.now()));
-    ref.read(dbProvider).getMeta('demo.seeded').then((v) {
-      if (mounted) setState(() => _demo = v == 'true');
-    });
   }
 
   @override
@@ -96,11 +92,6 @@ class _LockScreenState extends ConsumerState<LockScreen> {
               ),
             const SizedBox(height: Sp.lg),
             PinPad(key: ValueKey(_selected?.id), onComplete: _try),
-            if (_demo)
-              Padding(
-                padding: const EdgeInsets.only(top: Sp.sm),
-                child: Pill('Demo PINs · Owner 1111 · Manager 2222 · Cashier 3333', tone: Tone.info, icon: Icons.info_outline_rounded, dense: true),
-              ),
           ],
         ),
       ),

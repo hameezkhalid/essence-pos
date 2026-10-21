@@ -114,7 +114,6 @@ ReceiptDoc buildReceipt(Order o, AppSettings s, {bool reprint = false}) {
         RQr(o.fiscalInvoiceNo!),
         const RText('Verify this invoice through the FBR', align: RAlign.center),
         const RText('Tax Asaan app or SMS at 9966', align: RAlign.center),
-        if (s.fbr.mode == FbrMode.mock) const RText('(Demo: simulated FBR number)', align: RAlign.center),
       ]);
     } else {
       out.addAll(const [

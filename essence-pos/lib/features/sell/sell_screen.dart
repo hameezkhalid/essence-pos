@@ -81,15 +81,22 @@ class _SellScreenState extends ConsumerState<SellScreen> {
       child: Focus(
         autofocus: true,
         child: split
-            ? Row(children: [
-                Expanded(child: menu),
-                Container(width: 1, color: context.ec.border),
-                SizedBox(width: context.screenW >= 1400 ? 440 : 390, child: CartPanel(key: _cartKey)),
-              ])
-            : Column(children: [
-                Expanded(child: menu),
-                _CartBar(onOpen: () => showCartSheet(context)),
-              ]),
+            ? Row(
+                children: [
+                  Expanded(child: menu),
+                  Container(width: 1, color: context.ec.border),
+                  SizedBox(
+                    width: context.screenW >= 1400 ? 440 : 390,
+                    child: CartPanel(key: _cartKey),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  Expanded(child: menu),
+                  _CartBar(onOpen: () => showCartSheet(context)),
+                ],
+              ),
       ),
     );
   }
@@ -113,22 +120,31 @@ class _CartBar extends ConsumerWidget {
       child: SafeArea(
         top: false,
         child: Container(
-          decoration: BoxDecoration(border: Border(top: BorderSide(color: ec.border))),
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: ec.border)),
+          ),
           padding: const EdgeInsets.fromLTRB(Sp.lg, Sp.sm, Sp.lg, Sp.sm),
-          child: Row(children: [
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text(cart.isEmpty ? 'No items yet' : '${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} · ${cart.type.label}',
-                    style: context.tt.labelMedium?.copyWith(color: ec.textMuted)),
-                Text(cart.isEmpty ? 'Tap a product to start' : rs(total), style: context.tt.titleLarge?.copyWith(fontFeatures: tabular)),
-              ]),
-            ),
-            FilledButton.icon(
-              onPressed: onOpen,
-              icon: const Icon(Icons.shopping_bag_outlined),
-              label: const Text('View order'),
-            ),
-          ]),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      cart.isEmpty ? 'No items yet' : '${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} · ${cart.type.label}',
+                      style: context.tt.labelMedium?.copyWith(color: ec.textMuted),
+                    ),
+                    Text(
+                      cart.isEmpty ? 'Tap a product to start' : rs(total),
+                      style: context.tt.titleLarge?.copyWith(fontFeatures: tabular),
+                    ),
+                  ],
+                ),
+              ),
+              FilledButton.icon(onPressed: onOpen, icon: const Icon(Icons.shopping_bag_outlined), label: const Text('View order')),
+            ],
+          ),
         ),
       ),
     );
@@ -176,111 +192,126 @@ class _MenuPanel extends ConsumerWidget {
       return p.categoryId == category;
     }).toList();
     final effectiveCat = category == '_fav' && products.isEmpty && q.isEmpty ? '_all' : category;
-    final shown = effectiveCat != category
-        ? all.where((p) => activeCatIds.contains(p.categoryId)).toList()
-        : products;
+    final shown = effectiveCat != category ? all.where((p) => activeCatIds.contains(p.categoryId)).toList() : products;
     final compact = ref.watch(gridDensityProvider).value == 'compact';
     final pad = context.isPhone ? Sp.md : Sp.lg;
     final held = ref.watch(heldOrdersProvider).value ?? const [];
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: EdgeInsets.fromLTRB(pad, pad, pad, Sp.sm),
-        child: Row(children: [
-          Expanded(
-            child: TextField(
-              controller: search,
-              focusNode: searchFocus,
-              onChanged: onQuery,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) {
-                if (shown.length == 1) {
-                  onProduct(shown.first);
-                  search.clear();
-                  onQuery('');
-                }
-              },
-              decoration: InputDecoration(
-                hintText: context.isPhone ? 'Search menu' : 'Search menu or scan  (F2)',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: query.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Clear search',
-                        onPressed: () {
-                          search.clear();
-                          onQuery('');
-                        },
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(pad, pad, pad, Sp.sm),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: search,
+                  focusNode: searchFocus,
+                  onChanged: onQuery,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) {
+                    if (shown.length == 1) {
+                      onProduct(shown.first);
+                      search.clear();
+                      onQuery('');
+                    }
+                  },
+                  decoration: InputDecoration(
+                    hintText: context.isPhone ? 'Search menu' : 'Search menu or scan  (F2)',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: query.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Clear search',
+                            onPressed: () {
+                              search.clear();
+                              onQuery('');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: Sp.sm),
-          Badge(
-            isLabelVisible: held.isNotEmpty,
-            label: Text('${held.length}'),
-            backgroundColor: ec.accent,
-            child: OutlinedButton.icon(
-              onPressed: () => showHeldOrders(context, ref),
-              icon: const Icon(Icons.pause_circle_outline_rounded),
-              label: Text(context.isPhone ? 'Held' : 'Held orders'),
-              style: OutlinedButton.styleFrom(backgroundColor: ec.surface),
-            ),
-          ),
-        ]),
-      ),
-      SizedBox(
-        height: 46,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: pad),
-          children: [
-            _CatChip(label: 'Favourites', icon: Icons.star_rounded, selected: effectiveCat == '_fav' && q.isEmpty, onTap: () => onCategory('_fav')),
-            _CatChip(label: 'All', icon: Icons.apps_rounded, selected: effectiveCat == '_all' && q.isEmpty, onTap: () => onCategory('_all')),
-            for (final c in cats)
-              _CatChip(
-                label: c.name,
-                icon: iconFor(c.icon),
-                color: Color(c.color),
-                selected: effectiveCat == c.id && q.isEmpty,
-                onTap: () => onCategory(c.id),
+              const SizedBox(width: Sp.sm),
+              Badge(
+                isLabelVisible: held.isNotEmpty,
+                label: Text('${held.length}'),
+                backgroundColor: ec.accent,
+                child: OutlinedButton.icon(
+                  onPressed: () => showHeldOrders(context, ref),
+                  icon: const Icon(Icons.pause_circle_outline_rounded),
+                  label: Text(context.isPhone ? 'Held' : 'Held orders'),
+                  style: OutlinedButton.styleFrom(backgroundColor: ec.surface),
+                ),
               ),
-          ],
+            ],
+          ),
         ),
-      ),
-      const SizedBox(height: Sp.sm),
-      Expanded(
-        child: shown.isEmpty
-            ? EmptyState(
-                icon: q.isNotEmpty ? Icons.search_off_rounded : Icons.restaurant_menu_rounded,
-                title: q.isNotEmpty ? 'Nothing matches “$query”' : 'No products here yet',
-                message: q.isNotEmpty ? 'Try another name.' : 'Add products in Settings › Menu.',
-              )
-            : LayoutBuilder(builder: (context, c) {
-                final minTile = compact ? 128.0 : (context.isPhone ? 150.0 : 168.0);
-                final cols = ((c.maxWidth - pad * 2 + Sp.md) / (minTile + Sp.md)).floor().clamp(2, 10);
-                return GridView.builder(
-                  padding: EdgeInsets.fromLTRB(pad, Sp.xs, pad, pad + Sp.md),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: cols,
-                    mainAxisSpacing: Sp.md,
-                    crossAxisSpacing: Sp.md,
-                    mainAxisExtent: compact ? 118 : 148,
-                  ),
-                  itemCount: shown.length,
-                  itemBuilder: (context, i) => ProductTile(
-                    product: shown[i],
-                    compact: compact,
-                    inCart: inCart[shown[i].id] ?? 0,
-                    onTap: () => onProduct(shown[i]),
-                    onLongPress: () => onLongPress(shown[i]),
-                  ),
-                );
-              }),
-      ),
-    ]);
+        SizedBox(
+          height: 46,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: pad),
+            children: [
+              _CatChip(
+                label: 'Favourites',
+                icon: Icons.star_rounded,
+                selected: effectiveCat == '_fav' && q.isEmpty,
+                onTap: () => onCategory('_fav'),
+              ),
+              _CatChip(
+                label: 'All',
+                icon: Icons.apps_rounded,
+                selected: effectiveCat == '_all' && q.isEmpty,
+                onTap: () => onCategory('_all'),
+              ),
+              for (final c in cats)
+                _CatChip(
+                  label: c.name,
+                  icon: iconFor(c.icon),
+                  color: Color(c.color),
+                  selected: effectiveCat == c.id && q.isEmpty,
+                  onTap: () => onCategory(c.id),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: Sp.sm),
+        Expanded(
+          child: shown.isEmpty
+              ? EmptyState(
+                  icon: q.isNotEmpty ? Icons.search_off_rounded : Icons.restaurant_menu_rounded,
+                  title: q.isNotEmpty ? 'Nothing matches “$query”' : 'No products here yet',
+                  message: q.isNotEmpty ? 'Try another name.' : 'Add products in Settings › Menu.',
+                )
+              : LayoutBuilder(
+                  builder: (context, c) {
+                    final minTile = compact ? 128.0 : (context.isPhone ? 150.0 : 168.0);
+                    final cols = ((c.maxWidth - pad * 2 + Sp.md) / (minTile + Sp.md)).floor().clamp(2, 10);
+                    return GridView.builder(
+                      padding: EdgeInsets.fromLTRB(pad, Sp.xs, pad, pad + Sp.md),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: cols,
+                        mainAxisSpacing: Sp.md,
+                        crossAxisSpacing: Sp.md,
+                        mainAxisExtent: shown.any((p) => productPhoto(p.id) != null) ? (compact ? 168 : 212) : (compact ? 118 : 148),
+                      ),
+                      itemCount: shown.length,
+                      itemBuilder: (context, i) => ProductTile(
+                        product: shown[i],
+                        compact: compact,
+                        inCart: inCart[shown[i].id] ?? 0,
+                        onTap: () => onProduct(shown[i]),
+                        onLongPress: () => onLongPress(shown[i]),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }
 
@@ -305,11 +336,13 @@ class _CatChip extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Row(children: [
-              Icon(icon, size: 18, color: selected ? ec.onPrimary : (color ?? ec.textMuted)),
-              const SizedBox(width: 6),
-              Text(label, style: context.tt.labelLarge?.copyWith(color: selected ? ec.onPrimary : ec.text)),
-            ]),
+            child: Row(
+              children: [
+                Icon(icon, size: 18, color: selected ? ec.onPrimary : (color ?? ec.textMuted)),
+                const SizedBox(width: 6),
+                Text(label, style: context.tt.labelLarge?.copyWith(color: selected ? ec.onPrimary : ec.text)),
+              ],
+            ),
           ),
         ),
       ),
@@ -331,6 +364,7 @@ class ProductTile extends StatelessWidget {
     final p = product;
     final sold = !p.available;
     final color = Color(p.color);
+    final photo = productPhoto(p.id);
     final sizes = p.sizes;
     final minPrice = sizes.isEmpty ? p.price : p.price + sizes.map((s) => s.delta).reduce((a, b) => a < b ? a : b);
     return Semantics(
@@ -346,51 +380,97 @@ class ProductTile extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           onLongPress: onLongPress,
-          child: Stack(children: [
-            Padding(
-              padding: EdgeInsets.all(compact ? 10 : 14),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  IconBadge(icon: iconFor(p.icon), color: color, size: compact ? 34 : 44),
-                  const Spacer(),
-                  if (p.hasOptions && !compact) Icon(Icons.tune_rounded, size: 16, color: ec.textFaint),
-                ]),
-                const Spacer(),
-                Text(
-                  p.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: (compact ? context.tt.labelLarge : context.tt.titleSmall)?.copyWith(height: 1.2, fontSize: compact ? 13 : 14),
+          child: Stack(
+            children: [
+              if (photo != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Image.asset(photo, fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(compact ? 10 : 12, compact ? 8 : 10, compact ? 10 : 12, compact ? 8 : 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            p.name,
+                            maxLines: compact ? 1 : 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: (compact ? context.tt.labelLarge : context.tt.titleSmall)?.copyWith(
+                              height: 1.2,
+                              fontSize: compact ? 13 : 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            sizes.length > 1 ? 'from ${rs(minPrice)}' : rs(minPrice),
+                            style: context.tt.labelMedium?.copyWith(color: ec.accent, fontFeatures: tabular),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              else
+                Padding(
+                  padding: EdgeInsets.all(compact ? 10 : 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          IconBadge(icon: iconFor(p.icon), color: color, size: compact ? 34 : 44),
+                          const Spacer(),
+                          if (p.hasOptions && !compact) Icon(Icons.tune_rounded, size: 16, color: ec.textFaint),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(
+                        p.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: (compact ? context.tt.labelLarge : context.tt.titleSmall)?.copyWith(
+                          height: 1.2,
+                          fontSize: compact ? 13 : 14,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        sizes.length > 1 ? 'from ${rs(minPrice)}' : rs(minPrice),
+                        style: context.tt.labelMedium?.copyWith(color: ec.accent, fontFeatures: tabular),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  sizes.length > 1 ? 'from ${rs(minPrice)}' : rs(minPrice),
-                  style: context.tt.labelMedium?.copyWith(color: ec.accent, fontFeatures: tabular),
+              if (inCart > 0)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    constraints: const BoxConstraints(minWidth: 24),
+                    height: 24,
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(color: ec.primary, borderRadius: BorderRadius.circular(99)),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$inCart',
+                      style: context.tt.labelMedium?.copyWith(color: ec.onPrimary, fontWeight: FontWeight.w800),
+                    ),
+                  ),
                 ),
-              ]),
-            ),
-            if (inCart > 0)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  constraints: const BoxConstraints(minWidth: 24),
-                  height: 24,
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  decoration: BoxDecoration(color: ec.primary, borderRadius: BorderRadius.circular(99)),
-                  alignment: Alignment.center,
-                  child: Text('$inCart', style: context.tt.labelMedium?.copyWith(color: ec.onPrimary, fontWeight: FontWeight.w800)),
+              if (sold)
+                Positioned.fill(
+                  child: Container(
+                    color: ec.surface.withValues(alpha: 0.72),
+                    alignment: Alignment.center,
+                    child: const Pill('Sold out', tone: Tone.danger, icon: Icons.block_rounded),
+                  ),
                 ),
-              ),
-            if (sold)
-              Positioned.fill(
-                child: Container(
-                  color: ec.surface.withValues(alpha: 0.72),
-                  alignment: Alignment.center,
-                  child: const Pill('Sold out', tone: Tone.danger, icon: Icons.block_rounded),
-                ),
-              ),
-          ]),
+            ],
+          ),
         ),
       ),
     );

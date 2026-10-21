@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/boot.dart';
+import '../../app/platform.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/sync/firestore_remote.dart';
 import '../../shared/common.dart';
@@ -52,12 +53,14 @@ class _SetupFrame extends StatelessWidget {
       children: [
         EssenceLogo(size: wide ? 150 : 96),
         const SizedBox(height: Sp.xl),
-        Text('Essence POS', style: context.tt.displaySmall),
+        Text(adminPanel ? 'Essence Admin' : 'Essence POS', style: context.tt.displaySmall),
         const SizedBox(height: Sp.sm),
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
           child: Text(
-            'Offline-first point of sale with live sync, inventory and FBR invoicing.',
+            adminPanel
+                ? 'Live dashboard, menu, inventory and reports — plus the same POS as the tills.'
+                : 'Offline-first point of sale with live sync, inventory and FBR invoicing.',
             textAlign: wide ? TextAlign.start : TextAlign.center,
             style: context.tt.bodyLarge?.copyWith(color: ec.textMuted),
           ),
@@ -211,9 +214,8 @@ class _SetupScreenState extends State<SetupScreen> {
   bool _checking = true;
   bool _busy = false;
   String _step = '';
-  bool _demo = true;
-  final _name = TextEditingController(text: 'Counter 1');
-  final _code = TextEditingController(text: 'T1');
+  final _name = TextEditingController(text: adminPanel ? 'Admin panel' : 'Counter 1');
+  final _code = TextEditingController(text: adminPanel ? 'WEB' : 'T1');
   final _owner = TextEditingController();
   final _pin = TextEditingController();
 
@@ -242,7 +244,7 @@ class _SetupScreenState extends State<SetupScreen> {
       final c = await widget.boot.remote.claimOrJoin(u.uid, u.email ?? '').timeout(const Duration(seconds: 20));
       setState(() {
         _claim = c;
-        if (c == StoreClaim.member) {
+        if (c == StoreClaim.member && !adminPanel) {
           _name.text = 'Counter 2';
           _code.text = 'T2';
         }
@@ -260,7 +262,7 @@ class _SetupScreenState extends State<SetupScreen> {
   }
 
   Future<void> _finish() async {
-    if (_claim == StoreClaim.created && !_demo) {
+    if (_claim == StoreClaim.created) {
       if (_owner.text.trim().isEmpty || !RegExp(r'^\d{4}$').hasMatch(_pin.text)) {
         setState(() => _error = 'Enter the owner’s name and a 4-digit PIN');
         return;
@@ -275,7 +277,6 @@ class _SetupScreenState extends State<SetupScreen> {
         await widget.boot.setupNewStore(
           terminalName: _name.text,
           terminalCode: _code.text,
-          demo: _demo,
           ownerName: _owner.text.trim(),
           ownerPin: _pin.text,
           onStep: (s) => mounted ? setState(() => _step = s) : null,
@@ -337,10 +338,12 @@ class _SetupScreenState extends State<SetupScreen> {
       );
     }
     return _SetupFrame(
-      title: isNew ? 'Set up this till' : 'Add this till to Essence',
+      title: isNew ? 'Set up this till' : (adminPanel ? 'Open the admin panel' : 'Add this till to Essence'),
       subtitle: isNew
           ? 'You’re creating the Essence store. Name this terminal and choose how to start.'
-          : 'The store already exists. This terminal will download its menu, staff, settings and sales.',
+          : (adminPanel
+              ? 'This browser downloads the store’s menu, staff, settings and sales once, then stays in sync live.'
+              : 'The store already exists. This terminal will download its menu, staff, settings and sales.'),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
           Expanded(flex: 3, child: TextField(controller: _name, decoration: const InputDecoration(labelText: 'Terminal name'))),
@@ -356,13 +359,9 @@ class _SetupScreenState extends State<SetupScreen> {
         ]),
         if (isNew) ...[
           const SizedBox(height: Sp.lg),
-          LabeledSwitch(
-            title: 'Load demo data',
-            subtitle: 'Patisserie menu, recipes and stock, 3 staff, tables and 30 days of sales. Replace with the real menu later.',
-            value: _demo,
-            onChanged: (v) => setState(() => _demo = v),
-          ),
-          if (!_demo) ...[
+          Text('The Essence dessert menu is added for you. Now add the owner, who unlocks the till with a PIN.',
+              style: context.tt.bodySmall),
+          ...[
             const SizedBox(height: Sp.md),
             TextField(controller: _owner, decoration: const InputDecoration(labelText: 'Owner name')),
             const SizedBox(height: Sp.md),
@@ -384,7 +383,7 @@ class _SetupScreenState extends State<SetupScreen> {
         FilledButton.icon(
           onPressed: _finish,
           icon: const Icon(Icons.arrow_forward_rounded),
-          label: Text(isNew ? 'Set up the store' : 'Join and download'),
+          label: Text(isNew ? 'Set up the store' : (adminPanel ? 'Continue' : 'Join and download')),
         ),
       ]),
     );

@@ -1,11 +1,14 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../db/database.dart';
+import '../models/order_models.dart';
 import '../models/settings_models.dart';
+import '../tax/tax_engine.dart';
 import '../sync/sync_engine.dart';
 
 class FiscalResult {
@@ -22,31 +25,114 @@ abstract class FiscalAdapter {
   Future<FiscalResult> submit(Order order, FbrSettings settings, StoreSettings store);
 }
 
-/// Demo adapter: behaves like FBR (short delay, realistic invoice numbers) without a network call.
-class MockFbrAdapter implements FiscalAdapter {
-  final _rnd = Random();
+/// FBR POS integration (IMS) — posts each sale and returns FBR's invoice number.
+class FbrImsAdapter implements FiscalAdapter {
+  FbrImsAdapter({http.Client? client}) : _client = client ?? http.Client();
+  final http.Client _client;
+
+  static const sandboxUrl = 'https://esp.fbr.gov.pk:8244/FBR/v1/api/Live/PostData';
+  static const liveUrl = 'https://gw.fbr.gov.pk/imsp/v1/api/Live/PostData';
 
   @override
   Future<FiscalResult> submit(Order order, FbrSettings settings, StoreSettings store) async {
-    await Future<void>.delayed(Duration(milliseconds: 250 + _rnd.nextInt(450)));
-    final pos = settings.posId.trim().isEmpty ? '137284' : settings.posId.trim();
-    final t = DateTime.fromMillisecondsSinceEpoch(order.createdAt);
-    final no = '$pos-${DateFormat('MMdd').format(t)}-${DateFormat('HHmm').format(t)}-${(order.token ?? _rnd.nextInt(99)).toString().padLeft(2, '0')}${_rnd.nextInt(10)}';
-    return FiscalResult.reported(no);
+    if (!settings.hasCredentials) return const FiscalResult.failed('Add the FBR POS ID and token in Settings › FBR');
+    final body = fbrInvoicePayload(order, settings);
+    final http.Response r;
+    try {
+      r = await _client
+          .post(
+            Uri.parse(settings.mode == FbrMode.live ? liveUrl : sandboxUrl),
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${settings.token.trim()}'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 20));
+    } catch (e) {
+      return FiscalResult.failed('FBR not reachable: $e');
+    }
+    Map<String, dynamic> data = const {};
+    try {
+      data = Map<String, dynamic>.from(jsonDecode(r.body) as Map);
+    } catch (_) {}
+    final invoiceNo = (data['InvoiceNumber'] as String?)?.trim() ?? '';
+    final code = '${data['Code'] ?? ''}';
+    if (r.statusCode == 200 && invoiceNo.isNotEmpty && (code.isEmpty || code == '100')) {
+      return FiscalResult.reported(invoiceNo);
+    }
+    final msg = [data['Response'], data['Errors']].where((e) => e != null && '$e'.isNotEmpty).join(' · ');
+    return FiscalResult.failed('FBR ${r.statusCode}${code.isEmpty ? '' : ' / $code'}: ${msg.isEmpty ? r.body : msg}');
   }
 }
 
-/// Real FBR POS integration. Added after the demo, once the café's POS ID and token are issued.
-class FbrImsAdapter implements FiscalAdapter {
-  @override
-  Future<FiscalResult> submit(Order order, FbrSettings settings, StoreSettings store) async =>
-      const FiscalResult.failed('Live FBR integration is not configured yet');
+double _rs(int paisa) => paisa / 100;
+
+/// FBR IMS invoice JSON for a paid order. Tax and discount are shared across lines in
+/// proportion to each line's value so the item totals add up to the invoice totals.
+Map<String, dynamic> fbrInvoicePayload(Order o, FbrSettings s) {
+  final lines = o.lines;
+  final tax = _split(o.taxTotal, [for (final l in lines) l.net]);
+  final pays = o.payments;
+  final paymentMode = pays.length > 1
+      ? 5 // mixed
+      : (pays.isEmpty || pays.first.group == RateGroup.cash ? 1 : 2); // cash : card / online
+  final rateBp = o.taxLines.isEmpty ? 0 : o.taxLines.where((t) => t.group == (pays.firstOrNull?.group ?? RateGroup.cash)).fold<int>(0, (a, t) => a + t.rateBp);
+  final saleValue = o.total - o.taxTotal - o.fbrFee - o.rounding;
+  return {
+    'InvoiceNumber': '',
+    'POSID': int.tryParse(s.posId.trim()) ?? s.posId.trim(),
+    'USIN': o.number ?? o.id,
+    'DateTime': DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(o.paidAt ?? o.createdAt)),
+    'BuyerNTN': '',
+    'BuyerCNIC': '',
+    'BuyerName': o.customerName ?? '',
+    'BuyerPhoneNumber': o.customerPhone ?? '',
+    'TotalBillAmount': _rs(saleValue + o.taxTotal),
+    'TotalQuantity': lines.fold<int>(0, (a, l) => a + l.qty),
+    'TotalSaleValue': _rs(saleValue),
+    'TotalTaxCharged': _rs(o.taxTotal),
+    'Discount': _rs(o.discountTotal),
+    'FurtherTax': 0,
+    'PaymentMode': paymentMode,
+    'RefUSIN': null,
+    'InvoiceType': 1,
+    'Items': [
+      for (var i = 0; i < lines.length; i++)
+        () {
+          final l = lines[i];
+          final lineSale = o.pricesIncludeTax ? l.net - tax[i] : l.net;
+          return {
+            'ItemCode': l.productId,
+            'ItemName': l.title,
+            'Quantity': l.qty,
+            'PCTCode': s.pctCode.trim().isEmpty ? '00000000' : s.pctCode.trim(),
+            'TaxRate': rateBp / 100,
+            'SaleValue': _rs(lineSale),
+            'TotalAmount': _rs(lineSale + tax[i]),
+            'TaxCharged': _rs(tax[i]),
+            'Discount': _rs(l.gross - l.net < 0 ? 0 : l.gross - l.net),
+            'FurtherTax': 0,
+            'InvoiceType': 1,
+            'RefUSIN': null,
+          };
+        }(),
+    ],
+  };
+}
+
+List<int> _split(int amount, List<int> weights) {
+  final total = weights.fold<int>(0, (a, b) => a + b);
+  if (total <= 0) return List.filled(weights.length, 0);
+  final out = [for (final w in weights) amount * w ~/ total];
+  var left = amount - out.fold<int>(0, (a, b) => a + b);
+  for (var i = 0; left > 0 && i < out.length; i++, left--) {
+    out[i]++;
+  }
+  return out;
 }
 
 /// Watches orders waiting for a fiscal number and reports them whenever the device is online.
 class FiscalQueue {
   FiscalQueue(this.db, this.sync, this.settings, {Map<FbrMode, FiscalAdapter>? adapters})
-      : adapters = adapters ?? {FbrMode.mock: MockFbrAdapter(), FbrMode.sandbox: FbrImsAdapter(), FbrMode.live: FbrImsAdapter()};
+      : adapters = adapters ?? {FbrMode.sandbox: FbrImsAdapter(), FbrMode.live: FbrImsAdapter()};
 
   final AppDatabase db;
   final SyncEngine sync;
@@ -76,6 +162,8 @@ class FiscalQueue {
     _running = true;
     try {
       final s = settings();
+      // FBR invoices switched off: nothing is reported (sales made while off are never queued).
+      if (!s.fbr.enabled) return;
       final pending = await (db.select(db.orders)
             ..where((o) => o.fiscalStatus.equals('pending') & o.deviceId.equals(_deviceId) & o.deleted.equals(false))
             ..orderBy([(o) => OrderingTerm.asc(o.createdAt)])

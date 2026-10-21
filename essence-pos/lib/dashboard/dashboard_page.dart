@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,7 +11,6 @@ import '../core/money.dart';
 import '../core/services/reports.dart';
 import '../features/reports/report_widgets.dart';
 import '../shared/common.dart';
-import 'dashboard_app.dart';
 import 'live_store.dart';
 
 final _clock = DateFormat('h:mm a');
@@ -33,9 +31,9 @@ IconData _typeIcon(OrderType t) => switch (t) {
       OrderType.delivery => Icons.delivery_dining_outlined,
     };
 
+/// Live owner dashboard (reads Firestore directly). Shown as the Dashboard tab of the web admin panel.
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key, required this.user});
-  final User user;
+  const DashboardPage({super.key});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -98,20 +96,16 @@ class _DashboardPageState extends State<DashboardPage> {
       ]);
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          _Header(store: s, user: widget.user),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(pad),
-              children: [
-                Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1600), child: content)),
-              ],
-            ),
+    return ListView(
+      padding: EdgeInsets.all(pad),
+      children: [
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1600),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [_Header(store: s), content]),
           ),
-        ]),
-      ),
+        ),
+      ],
     );
   }
 
@@ -143,56 +137,29 @@ class _DashboardPageState extends State<DashboardPage> {
 // ───────────── Header ─────────────
 
 class _Header extends StatelessWidget {
-  const _Header({required this.store, required this.user});
+  const _Header({required this.store});
   final LiveStore store;
-  final User user;
 
   @override
   Widget build(BuildContext context) {
     final ec = context.ec;
-    final phone = context.isPhone;
     final live = store.error == null && !store.fromCache;
-    final date = DateFormat(phone ? 'EEE d MMM' : 'EEEE d MMMM yyyy').format(DateTime.now());
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: phone ? Sp.md : Sp.xl, vertical: Sp.sm),
-      decoration: BoxDecoration(color: ec.bg, border: Border(bottom: BorderSide(color: ec.border))),
-      child: Row(children: [
-        EssenceLogo(size: phone ? 38 : 44),
-        const SizedBox(width: Sp.md),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(store.settings.name, style: phone ? context.tt.titleLarge : context.tt.headlineSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            Row(children: [
-              _LiveDot(color: live ? ec.success : ec.warning, pulse: live),
-              const SizedBox(width: 6),
-              Text(live ? 'Live' : (store.error != null ? 'Paused' : 'Connecting…'),
-                  style: context.tt.labelMedium?.copyWith(color: live ? ec.success : ec.warning)),
-              Flexible(
-                child: Text('  ·  $date', style: context.tt.labelMedium?.copyWith(color: ec.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ]),
+    final date = DateFormat(context.isPhone ? 'EEE d MMM' : 'EEEE d MMMM yyyy').format(DateTime.now());
+    return PageTitle(
+      'Dashboard',
+      subtitle: date,
+      actions: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(color: live ? ec.successContainer : ec.warningContainer, borderRadius: BorderRadius.circular(99)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            _LiveDot(color: live ? ec.success : ec.warning, pulse: live),
+            const SizedBox(width: 8),
+            Text(live ? 'Live from every till' : (store.error != null ? 'Paused' : 'Connecting…'),
+                style: context.tt.labelMedium?.copyWith(color: live ? ec.success : ec.warning)),
           ]),
         ),
-        if (context.isDesktop && user.email != null)
-          Padding(
-            padding: const EdgeInsets.only(right: Sp.sm),
-            child: Text(user.email!, style: context.tt.bodySmall),
-          ),
-        IconButton(
-          tooltip: context.isDark ? 'Light theme' : 'Dark theme',
-          onPressed: () => toggleDashboardTheme(context),
-          icon: Icon(context.isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
-        ),
-        IconButton(
-          tooltip: 'Sign out${user.email == null ? '' : ' (${user.email})'}',
-          onPressed: () async {
-            final ok = await confirm(context, title: 'Sign out of the dashboard?', confirmLabel: 'Sign out');
-            if (ok) await FirebaseAuth.instance.signOut();
-          },
-          icon: const Icon(Icons.logout_rounded),
-        ),
-      ]),
+      ],
     );
   }
 }

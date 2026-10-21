@@ -5,9 +5,6 @@ abstract class BootActions {
   /// Signs this terminal out of the store account. Refuses while changes are waiting to upload.
   Future<String?> signOut();
 
-  /// Deletes all store data (cloud + this device) and loads fresh demo data. Owner only.
-  Future<String?> resetDemoData(void Function(String step) onStep);
-
   /// Deletes sales history (orders, refunds, shifts, cash, audit) keeping menu, staff, settings
   /// and current stock levels. Invoice numbers keep counting up.
   Future<String?> clearSalesHistory(void Function(String step) onStep);

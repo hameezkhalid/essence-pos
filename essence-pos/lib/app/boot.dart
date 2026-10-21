@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/db/database.dart';
 import '../core/models/settings_models.dart';
-import '../core/services/demo_data.dart';
+import '../core/services/real_menu.dart';
 import '../core/services/pos_context.dart';
 import '../core/services/repos.dart';
 import '../core/sync/firestore_remote.dart';
@@ -98,19 +98,13 @@ class BootAppState extends State<BootApp> implements BootActions {
   Future<void> setupNewStore({
     required String terminalName,
     required String terminalCode,
-    required bool demo,
     String? ownerName,
     String? ownerPin,
     required void Function(String) onStep,
   }) async {
-    final device = await _saveDevice(terminalName, terminalCode);
-    if (demo) {
-      await DemoData(db!, device).seed(onStep: onStep);
-      await db!.setMeta('demo.seeded', 'true');
-    } else {
-      onStep('Store defaults');
-      await seedEssentials(db!, ownerName: ownerName ?? 'Owner', ownerPin: ownerPin ?? '1111');
-    }
+    await _saveDevice(terminalName, terminalCode);
+    onStep('Store settings and menu');
+    await seedEssentials(db!, ownerName: ownerName ?? 'Owner', ownerPin: ownerPin ?? '1111');
     await db!.setMeta('store.ready', 'true');
     onStep('Starting the till');
     await _launch();
@@ -170,36 +164,6 @@ class BootAppState extends State<BootApp> implements BootActions {
     await FirebaseAuth.instance.signOut();
     _go(BootPhase.signIn);
     return null;
-  }
-
-  @override
-  Future<String?> resetDemoData(void Function(String step) onStep) async {
-    final s = services;
-    if (s == null) return 'Not ready';
-    if (!s.sync.status.online) return 'Connect to the internet to reset the store data.';
-    final device = s.device;
-    await s.dispose();
-    services = null;
-    _go(BootPhase.loading);
-    try {
-      for (final spec in db!.syncSpecs) {
-        onStep('Clearing ${spec.collection}…');
-        await remote.deleteAll(spec.collection);
-      }
-      await remote.deleteAll('live');
-      onStep('Clearing this device…');
-      await db!.wipeAll();
-      final keep = {'device.id', 'device.code', 'device.name', 'ui.theme', 'ui.density', 'printers', 'store.ready'};
-      await (db!.delete(db!.localMeta)..where((m) => m.key.isNotIn(keep))).go();
-      await DemoData(db!, device).seed(onStep: onStep);
-      await db!.setMeta('demo.seeded', 'true');
-      onStep('Uploading…');
-      await _launch();
-      return null;
-    } catch (e) {
-      await _launch();
-      return 'Reset failed: $e';
-    }
   }
 
   @override
@@ -296,7 +260,7 @@ class BootAppState extends State<BootApp> implements BootActions {
   }
 }
 
-/// Minimum data for a store that doesn't want demo data.
+/// A new store: settings, GST, payment methods, the owner and the Essence dessert menu.
 Future<void> seedEssentials(AppDatabase db, {required String ownerName, required String ownerPin}) async {
   final now = nowMs();
   await SettingsRepo(db).saveAll(const AppSettings());
@@ -323,8 +287,6 @@ Future<void> seedEssentials(AppDatabase db, {required String ownerName, required
     pm('bank', 'Bank transfer', 'cardOnline', 'bank', 4),
   ]);
   await db.saveAllSynced(db.staff, [StaffRepo.build(id: 'owner', name: ownerName, role: Role.owner, pin: ownerPin)]);
-  await db.saveAllSynced(db.categories, [
-    MenuCategory(id: 'hot', updatedAt: now, deleted: false, name: 'Hot Coffee', icon: 'coffee', color: 0xFF8A5A36, sortOrder: 0, active: true),
-  ]);
+  await RealMenu.seed(db);
   await db.saveAllSynced(db.areas, [Area(id: 'ground', updatedAt: now, deleted: false, name: 'Ground floor', sortOrder: 0)]);
 }

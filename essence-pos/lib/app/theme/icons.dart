@@ -66,3 +66,11 @@ const swatches = <int>[
   0xFF8A5A36, 0xFFB08A5E, 0xFFC08552, 0xFF6B4226, 0xFF3E3A36, 0xFF4E5726, 0xFF7A9A3A, 0xFF7A8C4A, //
   0xFF5B7A8C, 0xFF5A5A8C, 0xFF9C4A5A, 0xFFC77B8B, 0xFFB7791F, 0xFFC9954C, 0xFFA0703E, 0xFF6B5B3E,
 ];
+
+/// Photos bundled for the Essence dessert menu (cropped from the printed menu), by product id.
+const _menuPhotos = {
+  'm-brownie', 'm-chocolate-cake', 'm-og-cookies', 'm-lemon-tart', 'm-lemon-cake', 'm-blueberry-cheesecake', //
+  'm-banana-bread', 'm-tres-leches', 'm-tiramisu', 'm-salted-caramel-cheesecake', 'm-marble-cake',
+};
+
+String? productPhoto(String productId) => _menuPhotos.contains(productId) ? 'assets/images/menu/$productId.jpg' : null;

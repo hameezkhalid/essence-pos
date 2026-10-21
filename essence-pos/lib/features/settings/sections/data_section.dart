@@ -110,7 +110,7 @@ class _DataSectionState extends ConsumerState<DataSection> {
     final owner = ref.watch(roleProvider) == Role.owner;
 
     final (Tone tone, IconData icon, String label) = !s.online
-        ? (Tone.danger, Icons.cloud_off_rounded, s.forcedOffline ? 'Offline (demo switch)' : 'Offline — no internet')
+        ? (Tone.danger, Icons.cloud_off_rounded, 'Offline — no internet')
         : s.error != null && s.pending > 0
             ? (Tone.warning, Icons.sync_problem_rounded, 'Sync issue')
             : s.pending > 0 || s.syncing
@@ -143,13 +143,6 @@ class _DataSectionState extends ConsumerState<DataSection> {
                 label: const Text('Sync now'),
               ),
             ]),
-            const Divider(height: Sp.xl),
-            LabeledSwitch(
-              title: 'Work offline (demo)',
-              subtitle: 'Pretend the internet is down to show that the till keeps selling. Changes upload when you turn this off.',
-              value: s.forcedOffline,
-              onChanged: (v) => svc.sync.setForcedOffline(v),
-            ),
           ],
         ),
         SettingsCard(
@@ -195,19 +188,6 @@ class _DataSectionState extends ConsumerState<DataSection> {
                       'Menu, staff, settings and stock levels are kept, and invoice numbers keep counting up.',
                   doneMessage: 'Sales history cleared',
                   run: (b, onStep) => b.clearSalesHistory(onStep),
-                ),
-              ),
-              Divider(height: Sp.xl, color: ec.border),
-              _DangerRow(
-                title: 'Reset demo data',
-                subtitle: 'Deletes all store data and loads the demo menu, staff and sample sales again.',
-                button: 'Reset data',
-                onPressed: () => _danger(
-                  title: 'Reset demo data',
-                  message: 'Everything — menu, staff, settings, sales and stock — is deleted on every terminal and in the cloud, '
-                      'then replaced with fresh demo data.',
-                  doneMessage: 'Demo data reset',
-                  run: (b, onStep) => b.resetDemoData(onStep),
                 ),
               ),
             ]),

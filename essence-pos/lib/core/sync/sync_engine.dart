@@ -79,9 +79,11 @@ class SyncEngine {
   Future<void> start() async {
     if (_started) return;
     _started = true;
-    final forced = await db.getMeta('sync.forcedOffline') == 'true';
-    _emit(_current.copyWith(forcedOffline: forced));
-    if (forced) await _safe(() => remote.setNetworkEnabled(false));
+    // Always start online (an earlier build had a demo "work offline" switch that persisted).
+    if (await db.getMeta('sync.forcedOffline') == 'true') {
+      await db.setMeta('sync.forcedOffline', 'false');
+      await _safe(() => remote.setNetworkEnabled(true));
+    }
 
     _subs.add(db.watchOutboxCount().listen((n) {
       _emit(_current.copyWith(pending: n));
@@ -116,7 +118,7 @@ class SyncEngine {
     return ctrl.stream;
   }
 
-  /// Demo switch: behave as if the internet is down.
+  /// Behave as if the internet is down (used by tests).
   Future<void> setForcedOffline(bool offline) async {
     await db.setMeta('sync.forcedOffline', '$offline');
     _emit(_current.copyWith(forcedOffline: offline));

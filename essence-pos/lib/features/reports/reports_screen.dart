@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -95,12 +96,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   Future<void> _exportCsv(SalesReport r, DateSpan s) async {
     setState(() => _busy = true);
     try {
-      final loc = await getSaveLocation(
-        suggestedName: 'essence-sales-${s.from}-${s.to}.csv',
-        acceptedTypeGroups: const [XTypeGroup(label: 'CSV', extensions: ['csv'], mimeTypes: ['text/csv'])],
-      );
-      if (loc == null) return;
-      await XFile.fromData(utf8.encode(r.toCsv()), mimeType: 'text/csv').saveTo(loc.path);
+      final name = 'essence-sales-${s.from}-${s.to}.csv';
+      final file = XFile.fromData(utf8.encode(r.toCsv()), mimeType: 'text/csv', name: name);
+      if (kIsWeb) {
+        // Browsers download the file directly.
+        await file.saveTo(name);
+      } else {
+        final loc = await getSaveLocation(
+          suggestedName: name,
+          acceptedTypeGroups: const [XTypeGroup(label: 'CSV', extensions: ['csv'], mimeTypes: ['text/csv'])],
+        );
+        if (loc == null) return;
+        await file.saveTo(loc.path);
+      }
       if (mounted) toast(context, 'Exported ${r.orderCount + r.voids.length} orders to CSV', icon: Icons.download_done_rounded);
     } catch (e) {
       if (mounted) toast(context, 'Couldn’t save the CSV: $e', error: true);

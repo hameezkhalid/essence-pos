@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/product_thumb.dart';
 import '../../../app/providers.dart';
 import '../../../app/theme/icons.dart';
 import '../../../app/theme/tokens.dart';
@@ -263,7 +264,7 @@ class _ProductRow extends StatelessWidget {
     ]);
 
     final price = Text(_priceText(), textAlign: TextAlign.right, style: context.tt.titleSmall?.copyWith(color: ec.accent, fontFeatures: tabular));
-    final badge = Opacity(opacity: p.active ? 1 : 0.5, child: IconBadge(icon: iconFor(p.icon), color: Color(p.color), size: 40));
+    final badge = Opacity(opacity: p.active ? 1 : 0.5, child: ProductThumb(product: p, size: 40));
 
     return InkWell(
         onTap: canEdit ? onTap : null,
