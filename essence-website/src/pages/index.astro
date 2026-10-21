@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Story from '../components/Story.astro';
+import MenuGrid from '../components/MenuGrid.astro';
+import Moments from '../components/Moments.astro';
+import Pickup from '../components/Pickup.astro';
+import Visit from '../components/Visit.astro';
+import Icon from '../components/Icon.astro';
+import { seo } from '../content/copy';
+---
+
+<Base title={seo.home.title} description={seo.home.description} path="/" dark>
+  <Hero />
+  <Marquee />
+  <Story />
+
+  <section class="section home-menu" id="menu">
+    <div class="wrap">
+      <header class="section-head home-menu__head">
+        <p class="eyebrow" data-reveal>The menu</p>
+        <h2 class="h2" data-reveal>Pick your <em class="accent">moment.</em></h2>
+      </header>
+      <MenuGrid mode="tabs" />
+      <p class="home-menu__more" data-reveal>
+        <a class="btn btn--ghost" href="/menu">See the full menu <Icon name="arrow" /></a>
+      </p>
+    </div>
+  </section>
+
+  <Moments />
+  <Pickup />
+  <Visit />
+</Base>
+
+<style>
+  .home-menu__head {
+    text-align: center;
+    justify-items: center;
+  }
+  .home-menu__more {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(48px, 6vw, 72px);
+    color: var(--olive);
+  }
+</style>

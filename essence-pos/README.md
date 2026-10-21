@@ -7,7 +7,7 @@ One codebase, two apps:
 | Build | What it is | Where |
 |---|---|---|
 | **Windows** | The till (POS) | `essence_pos.exe` from the GitHub Actions build |
-| **Web** | The admin panel: live dashboard, menu, inventory, reports, settings — and the same POS | Firebase Hosting: https://essenceisb.web.app |
+| **Web** | The admin panel: live dashboard, menu, inventory, reports, settings — and the same POS | Firebase Hosting: https://essence-admin.web.app |
 
 - Flutter 3.47 · Dart 3.13 · Riverpod 3 · Drift (SQLite; IndexedDB in the browser) · Firebase (Auth, Firestore, Hosting)
 - Firebase project `essenceisb` · store id `essence`

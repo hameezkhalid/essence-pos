@@ -1,0 +1,144 @@
+{
+  "fetchedAt": "2026-10-21T00:00:00.000Z",
+  "categories": [
+    {
+      "id": "cat-chocolate",
+      "name": "Chocolate Favourites",
+      "sortOrder": 0
+    },
+    {
+      "id": "cat-fruity",
+      "name": "Fresh & Fruity",
+      "sortOrder": 1
+    },
+    {
+      "id": "cat-signature",
+      "name": "Signature Desserts",
+      "sortOrder": 2
+    }
+  ],
+  "products": [
+    {
+      "id": "m-brownie",
+      "categoryId": "cat-chocolate",
+      "name": "Chocolate Fudge Brownie",
+      "description": "Rich chocolate, cocoa, butter, a hint of vanilla.",
+      "price": 45000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 0
+    },
+    {
+      "id": "m-chocolate-cake",
+      "categoryId": "cat-chocolate",
+      "name": "Chocolate Cake",
+      "description": "Moist chocolate sponge, velvety chocolate frosting.",
+      "price": 65000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "m-og-cookies",
+      "categoryId": "cat-chocolate",
+      "name": "OG Cookies",
+      "description": "Classic recipe, premium ingredients, loaded with chocolate chips.",
+      "price": 35000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "m-lemon-tart",
+      "categoryId": "cat-fruity",
+      "name": "Lemon Tart",
+      "description": "Buttery tart shell, zesty lemon curd, fresh cream.",
+      "price": 55000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "m-lemon-cake",
+      "categoryId": "cat-fruity",
+      "name": "Lemon Cake",
+      "description": "Soft vanilla sponge, lemon glaze, fresh zest.",
+      "price": 55000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "m-blueberry-cheesecake",
+      "categoryId": "cat-fruity",
+      "name": "Blueberry Cheesecake",
+      "description": "Creamy cheesecake, real blueberries, buttery biscuit base.",
+      "price": 85000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 5
+    },
+    {
+      "id": "m-banana-bread",
+      "categoryId": "cat-fruity",
+      "name": "Banana Bread",
+      "description": "Ripe bananas, warm spices, golden finish.",
+      "price": 40000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 6
+    },
+    {
+      "id": "m-tres-leches",
+      "categoryId": "cat-signature",
+      "name": "Tres Leches Cake",
+      "description": "Three milks, soft sponge, light whipped cream.",
+      "price": 75000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 7
+    },
+    {
+      "id": "m-tiramisu",
+      "categoryId": "cat-signature",
+      "name": "Tiramisu",
+      "description": "Mascarpone, coffee, cocoa, classic Italian style.",
+      "price": 85000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 8
+    },
+    {
+      "id": "m-salted-caramel-cheesecake",
+      "categoryId": "cat-signature",
+      "name": "Salted Caramel Cheesecake",
+      "description": "Creamy cheesecake, salted caramel, biscuit base.",
+      "price": 85000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 9
+    },
+    {
+      "id": "m-marble-cake",
+      "categoryId": "cat-signature",
+      "name": "Marble Cake",
+      "description": "Vanilla and chocolate, beautifully swirled.",
+      "price": 45000,
+      "sizes": [],
+      "modifierGroupIds": [],
+      "available": true,
+      "sortOrder": 10
+    }
+  ],
+  "modifierGroups": []
+}

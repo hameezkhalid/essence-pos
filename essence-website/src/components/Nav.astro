@@ -1,0 +1,258 @@
+---
+import Icon from './Icon.astro';
+import Leaf from './Leaf.astro';
+
+interface Props { dark?: boolean }
+const { dark = false } = Astro.props;
+const here = Astro.url.pathname;
+const links = [
+  { href: '/menu', label: 'Menu' },
+  { href: '/#moments', label: 'Moments' },
+  { href: '/#pickup', label: 'Pickup' },
+  { href: '/#visit', label: 'Visit' },
+];
+---
+
+<header class:list={['nav', { 'nav--dark': dark }]} data-nav>
+  <div class="nav__inner">
+    <a class="brand" href="/" aria-label="Essence home">
+      <span class="brand__word">Essence</span>
+      <Leaf variant="twin" class="brand__leaf" />
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      {links.map((l) => <a href={l.href} aria-current={here === l.href ? 'page' : undefined}>{l.label}</a>)}
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--sm nav__cta" href="/menu">Order pickup</a>
+      <button class="cart-btn" type="button" data-open-cart aria-label="Open cart">
+        <Icon name="bag" />
+        <span class="cart-btn__count" data-cart-count hidden>0</span>
+      </button>
+      <button class="burger" type="button" data-burger aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+  <nav aria-label="Mobile">
+    {links.map((l, i) => <a href={l.href} style={`--i:${i}`}>{l.label}</a>)}
+  </nav>
+  <p class="script mobile-menu__script">Sweet moments, better here</p>
+</div>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--nav-h);
+    color: var(--ink);
+    transition: transform 0.5s var(--ease), background-color 0.4s, color 0.4s, box-shadow 0.4s;
+  }
+  .nav--dark {
+    color: var(--on-dark);
+  }
+  .nav.is-scrolled {
+    background: rgb(249 245 236 / 82%);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    color: var(--ink);
+    box-shadow: 0 1px 0 rgb(43 33 24 / 8%);
+  }
+  .nav.is-hidden {
+    transform: translateY(-100%);
+  }
+  .nav__inner {
+    height: 100%;
+    max-width: calc(var(--max) + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    margin-right: auto;
+  }
+  .brand__word {
+    font: 500 1.65rem/1 var(--serif);
+    letter-spacing: 0.02em;
+  }
+  .brand :global(.brand__leaf) {
+    width: 26px;
+    color: var(--olive);
+    transform: translateY(-6px);
+  }
+  .nav--dark:not(.is-scrolled) .brand :global(.brand__leaf) {
+    color: var(--gold);
+  }
+  .nav__links {
+    display: flex;
+    gap: 34px;
+  }
+  .nav__links a {
+    position: relative;
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding-block: 6px;
+  }
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease);
+  }
+  .nav__links a:hover::after,
+  .nav__links a[aria-current='page']::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .nav__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav--dark:not(.is-scrolled) .nav__cta {
+    --bg: var(--cream);
+    --fg: var(--cocoa);
+  }
+  .cart-btn {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+    display: grid;
+    place-items: center;
+    transition: transform 0.3s var(--ease);
+  }
+  .cart-btn:hover {
+    transform: scale(1.06);
+  }
+  .cart-btn :global(svg) {
+    width: 21px;
+    height: 21px;
+  }
+  .cart-btn__count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--coffee);
+    color: #fff;
+    font: 700 0.7rem/21px var(--sans);
+    text-align: center;
+  }
+  .cart-btn.bump {
+    animation: bump 0.55s var(--ease);
+  }
+  @keyframes bump {
+    30% {
+      transform: scale(1.22);
+    }
+    60% {
+      transform: scale(0.94);
+    }
+  }
+  .burger {
+    display: none;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    background: none;
+    position: relative;
+  }
+  .burger span {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.4s var(--ease), top 0.4s var(--ease);
+  }
+  .burger span:first-child {
+    top: 18px;
+  }
+  .burger span:last-child {
+    top: 27px;
+  }
+  .burger[aria-expanded='true'] span:first-child {
+    top: 22.5px;
+    transform: rotate(45deg);
+  }
+  .burger[aria-expanded='true'] span:last-child {
+    top: 22.5px;
+    transform: rotate(-45deg);
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: var(--cocoa);
+    color: var(--on-dark);
+    padding: calc(var(--nav-h) + 40px) var(--gutter) 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    clip-path: circle(0% at calc(100% - 44px) 36px);
+    transition: clip-path 0.7s var(--ease);
+  }
+  .mobile-menu.is-open {
+    clip-path: circle(150% at calc(100% - 44px) 36px);
+  }
+  .mobile-menu nav {
+    display: grid;
+    gap: 6px;
+  }
+  .mobile-menu a {
+    font: 500 clamp(2.6rem, 12vw, 3.6rem) / 1.15 var(--serif);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s, transform 0.6s var(--ease);
+    transition-delay: calc(0.15s + var(--i) * 0.06s);
+  }
+  .mobile-menu.is-open a {
+    opacity: 1;
+    transform: none;
+  }
+  .mobile-menu__script {
+    font-size: 2.2rem;
+    color: var(--gold);
+  }
+  :global(body.menu-open) .nav {
+    color: var(--on-dark);
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  @media (max-width: 860px) {
+    .nav__links,
+    .nav__cta {
+      display: none;
+    }
+    .burger {
+      display: block;
+    }
+  }
+</style>

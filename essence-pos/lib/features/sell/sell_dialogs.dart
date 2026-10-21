@@ -11,9 +11,11 @@ import '../../core/models/cart.dart';
 import '../../core/models/order_models.dart';
 import '../../core/models/settings_models.dart';
 import '../../core/money.dart';
+import '../../core/services/web_order_intake.dart';
 import '../../core/tax/tax_engine.dart';
 import '../../shared/approval.dart';
 import '../../shared/common.dart';
+import '../../shared/whatsapp.dart';
 
 // ───────────────────────── Tables ─────────────────────────
 
@@ -390,11 +392,19 @@ Future<void> showOrderNoteDialog(BuildContext context, WidgetRef ref) async {
 
 // ───────────────────────── Held orders ─────────────────────────
 
-Future<void> showHeldOrders(BuildContext context, WidgetRef ref) =>
-    showAdaptive<void>(context, maxWidth: 640, builder: (_) => const _HeldOrders());
+Future<void> showHeldOrders(BuildContext context, WidgetRef ref, {bool webOnly = false}) =>
+    showAdaptive<void>(context, maxWidth: 680, builder: (_) => _HeldOrders(webOnly: webOnly));
 
-class _HeldOrders extends ConsumerWidget {
-  const _HeldOrders();
+class _HeldOrders extends ConsumerStatefulWidget {
+  const _HeldOrders({this.webOnly = false});
+  final bool webOnly;
+  @override
+  ConsumerState<_HeldOrders> createState() => _HeldOrdersState();
+}
+
+class _HeldOrdersState extends ConsumerState<_HeldOrders> {
+  late bool _webOnly = widget.webOnly;
+  String _q = '';
 
   String _age(int ms) {
     final m = DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(ms)).inMinutes;
@@ -403,77 +413,158 @@ class _HeldOrders extends ConsumerWidget {
     return '${m ~/ 60} h ${m % 60} min';
   }
 
+  bool _matches(Order o) {
+    if (_webOnly && !o.isWeb) return false;
+    final q = _q.trim().toUpperCase().replaceAll('#', '');
+    if (q.isEmpty) return true;
+    return (o.webCode ?? '').contains(q) ||
+        o.tokenLabel.contains(q) ||
+        (o.customerName ?? '').toUpperCase().contains(q) ||
+        (o.customerPhone ?? '').replaceAll(RegExp(r'\D'), '').contains(q);
+  }
+
+  Future<void> _whatsApp(Order o, String template) async {
+    final s = ref.read(settingsValueProvider);
+    final ok = await openWhatsApp(o.customerPhone ?? '', fillTemplate(template, o, s));
+    if (!ok && mounted) toast(context, 'Couldn’t open WhatsApp on this device', error: true);
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ec = context.ec;
-    final held = ref.watch(heldOrdersProvider).value ?? const [];
+    final all = ref.watch(heldOrdersProvider).value ?? const [];
+    final online = ref.watch(settingsValueProvider).online;
+    final webCount = all.where((o) => o.isWeb).length;
+    final held = all.where(_matches).toList();
     return DialogFrame(
-      title: 'Held orders',
-      subtitle: 'Shared across all tills',
-      icon: Icons.pause_circle_outline_rounded,
-      child: held.isEmpty
-          ? const EmptyState(icon: Icons.inbox_outlined, title: 'No held orders', message: 'Hold an order (F4) to serve the next customer, then recall it here.')
-          : Column(children: [
-              for (final o in held)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: Sp.sm),
-                  child: AppCard(
-                    padding: const EdgeInsets.all(Sp.md),
-                    child: Row(children: [
-                      Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(color: ec.accentContainer, borderRadius: BorderRadius.circular(Rad.md)),
-                        alignment: Alignment.center,
-                        child: Text(o.tokenLabel, style: context.tt.titleSmall?.copyWith(color: ec.accent)),
-                      ),
-                      const SizedBox(width: Sp.md),
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(
-                            [o.type.label, if (o.tableLabel != null) 'Table ${o.tableLabel}', if (o.customerName != null) o.customerName!].join(' · '),
-                            style: context.tt.titleSmall,
-                          ),
-                          Text(o.lines.map((l) => '${l.qty}× ${l.name}').join(', '), maxLines: 1, overflow: TextOverflow.ellipsis, style: context.tt.bodySmall),
-                          Text('${_age(o.createdAt)} · ${o.staffName} · ${o.deviceCode}${o.kotSent ? ' · sent to bar' : ''}', style: context.tt.labelSmall),
-                        ]),
-                      ),
-                      const SizedBox(width: Sp.sm),
-                      Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Text(rs(o.total), style: context.tt.titleSmall?.copyWith(fontFeatures: tabular)),
-                        const SizedBox(height: 4),
-                        Row(mainAxisSize: MainAxisSize.min, children: [
-                          IconButton(
-                            tooltip: 'Discard',
-                            onPressed: () async {
-                              final staff = ref.read(sessionProvider);
-                              if (staff == null) return;
-                              if (await confirm(context, title: 'Discard ${o.tokenLabel}?', message: 'This removes the held order from every till.', confirmLabel: 'Discard', destructive: true)) {
-                                await ref.read(servicesProvider).pos.discardHeld(o.id, staff);
-                              }
-                            },
-                            icon: Icon(Icons.delete_outline_rounded, color: ec.danger),
-                          ),
-                          FilledButton(
-                            onPressed: () async {
-                              final cart = ref.read(cartProvider);
-                              if (!cart.isEmpty && cart.heldOrderId != o.id) {
-                                final staff = ref.read(sessionProvider);
-                                final ok = await confirm(context, title: 'Hold the current order?', message: 'Your current order will be held so you can recall ${o.tokenLabel}.', confirmLabel: 'Hold & recall');
-                                if (!ok || staff == null) return;
-                                await ref.read(servicesProvider).pos.hold(cart, staff: staff);
-                              }
-                              ref.read(cartProvider.notifier).load(CartState.fromOrder(o));
-                              if (context.mounted) Navigator.pop(context);
-                            },
-                            child: const Text('Recall'),
-                          ),
-                        ]),
-                      ]),
-                    ]),
+      title: _webOnly ? 'Online orders' : 'Held orders',
+      subtitle: _webOnly ? 'Website pickups, waiting to be collected' : 'Shared across all tills',
+      icon: _webOnly ? Icons.language_rounded : Icons.pause_circle_outline_rounded,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        if (all.length > 3 || webCount > 0)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Sp.md),
+            child: Row(children: [
+              Expanded(
+                child: TextField(
+                  autofocus: _webOnly,
+                  onChanged: (v) => setState(() => _q = v),
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: const InputDecoration(
+                    hintText: 'Order ID, name or phone',
+                    prefixIcon: Icon(Icons.search_rounded),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10),
                   ),
                 ),
+              ),
+              if (webCount > 0) ...[
+                const SizedBox(width: Sp.sm),
+                FilterChip(
+                  label: Text('Online ($webCount)'),
+                  selected: _webOnly,
+                  onSelected: (v) => setState(() => _webOnly = v),
+                ),
+              ],
             ]),
+          ),
+        if (held.isEmpty)
+          all.isEmpty
+              ? const EmptyState(icon: Icons.inbox_outlined, title: 'No held orders', message: 'Hold an order (F4) to serve the next customer, then recall it here.')
+              : const EmptyState(icon: Icons.search_off_rounded, title: 'No matching orders')
+        else
+          for (final o in held)
+            Padding(
+              padding: const EdgeInsets.only(bottom: Sp.sm),
+              child: AppCard(
+                padding: const EdgeInsets.all(Sp.md),
+                child: Row(children: [
+                  Container(
+                    width: 64,
+                    height: 54,
+                    decoration: BoxDecoration(color: o.isWeb ? ec.primaryContainer : ec.accentContainer, borderRadius: BorderRadius.circular(Rad.md)),
+                    alignment: Alignment.center,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      if (o.isWeb) Text('WEB', style: context.tt.labelSmall?.copyWith(color: ec.onPrimaryContainer, letterSpacing: 1)),
+                      Text(
+                        o.isWeb ? '#${o.webCode}' : o.tokenLabel,
+                        style: context.tt.titleSmall?.copyWith(color: o.isWeb ? ec.onPrimaryContainer : ec.accent),
+                      ),
+                    ]),
+                  ),
+                  const SizedBox(width: Sp.md),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(
+                        [
+                          o.isWeb ? 'Pickup' : o.type.label,
+                          if (o.tableLabel != null) 'Table ${o.tableLabel}',
+                          if (o.customerName != null) o.customerName!,
+                          if (o.isWeb && (o.customerPhone ?? '').isNotEmpty) o.customerPhone!,
+                        ].join(' · '),
+                        style: context.tt.titleSmall,
+                      ),
+                      Text(o.lines.map((l) => '${l.qty}× ${l.name}').join(', '), maxLines: 1, overflow: TextOverflow.ellipsis, style: context.tt.bodySmall),
+                      Text('${_age(o.createdAt)} · ${o.staffName} · ${o.deviceCode}${o.kotSent ? ' · sent to bar' : ''}', style: context.tt.labelSmall),
+                    ]),
+                  ),
+                  const SizedBox(width: Sp.sm),
+                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Text(rs(o.isWeb ? o.itemsGross : o.total), style: context.tt.titleSmall?.copyWith(fontFeatures: tabular)),
+                    const SizedBox(height: 4),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (o.isWeb && (o.customerPhone ?? '').isNotEmpty)
+                        PopupMenuButton<String>(
+                          tooltip: 'Message on WhatsApp',
+                          icon: Icon(Icons.chat_outlined, color: ec.success),
+                          onSelected: (t) => _whatsApp(o, t),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(value: online.placedTemplate, child: const Text('Order placed')),
+                            PopupMenuItem(value: online.readyTemplate, child: const Text('Ready for pickup')),
+                            PopupMenuItem(value: online.cancelledTemplate, child: const Text('Cancelled')),
+                          ],
+                        ),
+                      IconButton(
+                        tooltip: 'Discard',
+                        onPressed: () async {
+                          final staff = ref.read(sessionProvider);
+                          if (staff == null) return;
+                          final what = o.isWeb ? 'online order #${o.webCode}' : o.tokenLabel;
+                          if (await confirm(
+                            context,
+                            title: 'Discard $what?',
+                            message: o.isWeb
+                                ? 'This removes the order from every till. Send the customer the “Cancelled” WhatsApp message if they haven’t been told.'
+                                : 'This removes the held order from every till.',
+                            confirmLabel: 'Discard',
+                            destructive: true,
+                          )) {
+                            final svc = ref.read(servicesProvider);
+                            await svc.pos.discardHeld(o.id, staff);
+                            if (o.isWeb) unawaited(svc.webOrders?.cancel(o) ?? svc.webInbox?.markCancelled(o.webCode!));
+                          }
+                        },
+                        icon: Icon(Icons.delete_outline_rounded, color: ec.danger),
+                      ),
+                      FilledButton(
+                        onPressed: () async {
+                          final cart = ref.read(cartProvider);
+                          if (!cart.isEmpty && cart.heldOrderId != o.id) {
+                            final staff = ref.read(sessionProvider);
+                            final ok = await confirm(context, title: 'Hold the current order?', message: 'Your current order will be held so you can recall ${o.isWeb ? '#${o.webCode}' : o.tokenLabel}.', confirmLabel: 'Hold & recall');
+                            if (!ok || staff == null) return;
+                            await ref.read(servicesProvider).pos.hold(cart, staff: staff);
+                          }
+                          ref.read(cartProvider.notifier).load(CartState.fromOrder(o));
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                        child: const Text('Recall'),
+                      ),
+                    ]),
+                  ]),
+                ]),
+              ),
+            ),
+      ]),
     );
   }
 }

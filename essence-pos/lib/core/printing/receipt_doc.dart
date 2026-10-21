@@ -10,8 +10,11 @@ sealed class RLine {
 }
 
 class RText extends RLine {
-  const RText(this.text, {this.align = RAlign.left, this.bold = false, this.big = false, this.tall = false});
+  const RText(this.text, {this.align = RAlign.left, this.bold = false, this.big = false, this.tall = false, this.link});
   final String text;
+
+  /// Opened when the line is tapped in the on-screen receipt (printed as plain text).
+  final String? link;
   final RAlign align;
   final bool bold;
 

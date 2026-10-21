@@ -240,6 +240,10 @@ extension OrderX on Order {
   String get displayNumber => number ?? 'Held';
   DateTime get created => DateTime.fromMillisecondsSinceEpoch(createdAt);
 
+  /// Website pickup orders keep the id `web-{CODE}` from arrival through payment.
+  bool get isWeb => id.startsWith('web-');
+  String? get webCode => isWeb ? id.substring(4) : null;
+
   /// Sales value after refunds.
   int get netSales => total - refundedTotal;
 }

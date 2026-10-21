@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,7 +71,11 @@ class _StoreSectionState extends SettingsFormState<StoreSection> {
   }
 
   @override
-  Future<void> persist() => ref.read(servicesProvider).settingsRepo.save(SettingKeys.store, _draft.toJson());
+  Future<void> persist() async {
+    final svc = ref.read(servicesProvider);
+    await svc.settingsRepo.save(SettingKeys.store, _draft.toJson());
+    unawaited(svc.publishWebsiteInfo(store: _draft));
+  }
 
   @override
   String get savedMessage => 'Store profile saved';

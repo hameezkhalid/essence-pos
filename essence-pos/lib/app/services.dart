@@ -6,16 +6,20 @@ import 'package:drift/drift.dart';
 import '../core/db/database.dart';
 import '../core/fiscal/fiscal.dart';
 import '../core/models/menu_models.dart';
+import '../core/models/settings_models.dart';
 import '../core/printing/printer_service.dart';
 import '../core/services/inventory_service.dart';
 import '../core/services/pos_context.dart';
 import '../core/services/pos_service.dart';
 import '../core/services/repos.dart';
 import '../core/services/shift_service.dart';
+import '../core/services/web_order_intake.dart';
 import '../core/sync/account_admin.dart';
 import '../core/sync/firestore_remote.dart';
 import '../core/sync/remote_store.dart';
 import '../core/sync/sync_engine.dart';
+import '../core/sync/web_order_inbox.dart';
+import 'platform.dart';
 import '../firebase_options.dart';
 
 const appVersion = '1.0.0';
@@ -35,6 +39,12 @@ class AppServices {
     pos = PosService(db, ctx, inventory, printer);
     shifts = ShiftService(db, ctx, printer);
     fiscal = FiscalQueue(db, sync, () => ctx.settings);
+    final fs = firestore;
+    if (fs != null) {
+      webInbox = FirestoreWebOrderInbox(fs);
+      // Tills receive website orders; the admin panel only publishes the website's store info.
+      if (!adminPanel) webOrders = WebOrderIntake(db, pos, webInbox!, device);
+    }
   }
 
   final AppDatabase db;
@@ -59,6 +69,10 @@ class AppServices {
   late final ShiftService shifts;
   late final FiscalQueue fiscal;
 
+  /// Website pickup orders (null without Firestore). Only tills receive them.
+  WebOrderInbox? webInbox;
+  WebOrderIntake? webOrders;
+
   final _subs = <StreamSubscription<dynamic>>[];
   Timer? _heartbeat;
   Timer? _stockDebounce;
@@ -76,6 +90,7 @@ class AppServices {
   Future<void> start() async {
     await sync.start();
     fiscal.start(device.id);
+    webOrders?.start();
     _heartbeat = Timer.periodic(const Duration(minutes: 5), (_) => beat());
     unawaited(beat());
     // Publish a live stock summary for the owner dashboard (debounced, best effort).
@@ -85,9 +100,17 @@ class AppServices {
     }));
   }
 
+  /// Pushes the store info the website shows (after Online orders or Store profile settings change).
+  Future<void> publishWebsiteInfo({StoreSettings? store, OnlineOrderSettings? online}) async {
+    try {
+      await webInbox?.publishSite(publicSiteInfo(store ?? ctx.settings.store, online ?? ctx.settings.online));
+    } catch (_) {}
+  }
+
   /// Marks this terminal as seen (shown on the dashboard's terminal list).
   Future<void> beat() async {
     if (!sync.status.online) return;
+    unawaited(webOrders?.heartbeat());
     final t = await (db.select(db.terminals)..where((t) => t.id.equals(device.id))).getSingleOrNull();
     await db.saveSynced(
       db.terminals,
@@ -141,6 +164,7 @@ class AppServices {
       unawaited(s.cancel());
     }
     fiscal.stop();
+    webOrders?.dispose();
     await sync.dispose();
     ctx.dispose();
     pos.dispose();

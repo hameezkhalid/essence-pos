@@ -1,0 +1,366 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import Leaf from './Leaf.astro';
+import { photoFor } from '../lib/images';
+import { hero } from '../content/copy';
+
+const main = photoFor('m-chocolate-cake');
+const left = photoFor('m-brownie');
+const right = photoFor('m-tiramisu');
+const ring = 'Belgian chocolate · Freshly baked · ';
+---
+
+<section class="hero grain" data-hero>
+  <div class="hero__glow" aria-hidden="true"></div>
+  <Leaf draw class="hero__leaf" />
+
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <h1>
+        <span class="eyebrow hero__eyebrow">Belgian chocolate cakes in Bahria Town Phase 8</span>
+        <span class="display hero__title">
+          {
+            hero.title.map((w, i) => (
+              <span class="mask">
+                <span class:list={['word', { accent: i === 1 }]} style={`--d:${0.15 + i * 0.12}s`}>
+                  {w}
+                </span>
+              </span>
+            ))
+          }
+        </span>
+      </h1>
+      <p class="hero__sub">{hero.sub}</p>
+      <div class="hero__ctas">
+        <a class="btn btn--cream" href="/menu" data-magnetic>Order for pickup <Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href="#menu">See the menu</a>
+      </div>
+      <p class="script hero__script">{hero.script}</p>
+    </div>
+
+    <div class="hero__art" data-hero-art>
+      {
+        left && (
+          <div class="hero__img hero__img--a" data-depth="28">
+            <div class="arch">
+              <Picture src={left} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 32vw, 200px" alt="Chocolate fudge brownie" loading="eager" />
+            </div>
+          </div>
+        )
+      }
+      {
+        main && (
+          <div class="hero__img hero__img--main" data-depth="14">
+            <div class="arch">
+              <Picture
+                src={main}
+                formats={['avif', 'webp']}
+                widths={[280, 360]}
+                sizes="(max-width: 860px) 52vw, 340px"
+                alt="Belgian chocolate cake with velvety chocolate frosting"
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+          </div>
+        )
+      }
+      {
+        right && (
+          <div class="hero__img hero__img--b" data-depth="36">
+            <div class="arch">
+              <Picture src={right} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 30vw, 190px" alt="Tiramisu" loading="eager" />
+            </div>
+          </div>
+        )
+      }
+      <div class="hero__badge" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <defs><path id="ring" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
+          <text textLength="486" lengthAdjust="spacing"><textPath href="#ring" textLength="486" lengthAdjust="spacing">{ring}</textPath></text>
+        </svg>
+        <Leaf variant="twin" class="hero__badge-leaf" />
+      </div>
+    </div>
+  </div>
+
+  <a class="hero__scroll" href="#story" aria-label="Scroll to the story">
+    <span></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(680px, 100svh);
+    background: radial-gradient(120% 90% at 75% 40%, var(--cocoa-2) 0%, var(--cocoa) 62%);
+    color: var(--on-dark);
+    display: flex;
+    align-items: center;
+    padding-block: calc(var(--nav-h) + 40px) 90px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero__glow {
+    position: absolute;
+    width: 70vmax;
+    aspect-ratio: 1;
+    right: -20vmax;
+    top: -15vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(201 147 102 / 26%), transparent 62%);
+    z-index: -1;
+    animation: glow 9s ease-in-out infinite alternate;
+  }
+  @keyframes glow {
+    to {
+      transform: translate(-6vmax, 6vmax) scale(1.1);
+    }
+  }
+  .hero :global(.hero__leaf) {
+    position: absolute;
+    left: -30px;
+    top: 70px;
+    width: clamp(160px, 22vw, 300px);
+    color: rgb(217 183 126 / 40%);
+    transform: rotate(-12deg);
+    z-index: -1;
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    align-items: center;
+    gap: clamp(32px, 5vw, 80px);
+  }
+  .hero h1 {
+    display: grid;
+    gap: 22px;
+    font-weight: 500;
+  }
+  .hero__eyebrow {
+    color: var(--gold);
+    opacity: 0;
+    animation: fade-up 0.9s 0.05s var(--ease) forwards;
+  }
+  .hero__title {
+    display: grid;
+    line-height: 0.98;
+  }
+  .mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+  }
+  .word {
+    display: inline-block;
+    transform: translateY(105%);
+    animation: rise 1.2s var(--d) var(--ease) forwards;
+  }
+  .word.accent {
+    font-style: italic;
+    color: var(--gold);
+    padding-left: 0.5em;
+  }
+  @keyframes rise {
+    to {
+      transform: none;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .hero__sub {
+    margin-top: 26px;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    color: var(--on-dark-muted);
+    max-width: 34ch;
+    opacity: 0;
+    animation: fade-up 1s 0.5s var(--ease) forwards;
+  }
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+    opacity: 0;
+    animation: fade-up 1s 0.65s var(--ease) forwards;
+  }
+  .hero__ctas .btn--ghost {
+    color: var(--on-dark);
+  }
+  .hero__script {
+    margin-top: 40px;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    color: rgb(217 183 126 / 85%);
+    transform: rotate(-4deg);
+    transform-origin: left;
+    opacity: 0;
+    animation: fade-up 1.2s 0.9s var(--ease) forwards;
+  }
+
+  .hero__art {
+    position: relative;
+    height: clamp(420px, 46vw, 600px);
+  }
+  .hero__img {
+    position: absolute;
+    will-change: transform;
+  }
+  .hero__img .arch {
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 70%);
+    background: var(--cocoa-3);
+  }
+  .hero__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__img--main {
+    width: 58%;
+    left: 21%;
+    top: 4%;
+    animation: drop-in 1.4s 0.2s var(--ease) both;
+  }
+  .hero__img--main .arch {
+    aspect-ratio: 3 / 4;
+    outline: 1px solid rgb(217 183 126 / 35%);
+    outline-offset: 12px;
+  }
+  .hero__img--a {
+    width: 34%;
+    left: -2%;
+    bottom: 2%;
+    animation: drop-in 1.4s 0.45s var(--ease) both;
+  }
+  .hero__img--a .arch,
+  .hero__img--b .arch {
+    aspect-ratio: 4 / 5;
+  }
+  .hero__img--b {
+    width: 32%;
+    right: -3%;
+    bottom: 12%;
+    animation: drop-in 1.4s 0.6s var(--ease) both;
+  }
+  .hero__img .arch {
+    animation: float 7s ease-in-out infinite alternate;
+  }
+  .hero__img--a .arch {
+    animation-duration: 8.5s;
+    animation-delay: -2s;
+  }
+  .hero__img--b .arch {
+    animation-duration: 6.5s;
+    animation-delay: -4s;
+  }
+  @keyframes drop-in {
+    from {
+      opacity: 0;
+      transform: translateY(80px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes float {
+    to {
+      translate: 0 -14px;
+    }
+  }
+  .hero__badge {
+    position: absolute;
+    left: 6%;
+    top: 2%;
+    width: clamp(96px, 11vw, 140px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--olive);
+    color: var(--cream);
+    display: grid;
+    place-items: center;
+    animation: fade-up 1s 1s var(--ease) both;
+  }
+  .hero__badge svg {
+    position: absolute;
+    inset: 0;
+    animation: spin 22s linear infinite;
+  }
+  .hero__badge text {
+    font: 600 15px var(--sans);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    fill: currentColor;
+  }
+  .hero__badge :global(.hero__badge-leaf) {
+    width: 34%;
+    color: var(--gold);
+  }
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    width: 26px;
+    height: 42px;
+    margin-left: -13px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px rgb(246 239 226 / 50%);
+  }
+  .hero__scroll span {
+    position: absolute;
+    left: 50%;
+    top: 9px;
+    width: 3px;
+    height: 8px;
+    margin-left: -1.5px;
+    border-radius: 3px;
+    background: var(--on-dark);
+    animation: wheel 1.8s var(--ease) infinite;
+  }
+  @keyframes wheel {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    70% {
+      transform: translateY(14px);
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .hero {
+      padding-block: calc(var(--nav-h) + 24px) 80px;
+    }
+    .hero__grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .hero__art {
+      height: min(100vw, 480px);
+      margin-top: 8px;
+    }
+    .hero__script {
+      margin-top: 28px;
+    }
+    .hero__scroll {
+      display: none;
+    }
+  }
+</style>

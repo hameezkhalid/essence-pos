@@ -34,6 +34,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "site": "essence-admin",
     "public": "build/web",
     "ignore": [
       "firebase.json",

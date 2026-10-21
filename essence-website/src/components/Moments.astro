@@ -1,0 +1,111 @@
+---
+import { Picture } from 'astro:assets';
+import Leaf from './Leaf.astro';
+import { photoFor } from '../lib/images';
+import { slugOf } from '../lib/menu';
+import { moments } from '../content/copy';
+---
+
+<section class="moments section" id="moments">
+  <Leaf draw class="moments__leaf" />
+  <div class="wrap">
+    <header class="section-head moments__head">
+      <p class="eyebrow" data-reveal>Every occasion</p>
+      <h2 class="h2" data-reveal>Made for your <em class="accent">sweetest</em> moments</h2>
+      <p class="lead" data-reveal>{moments.intro}</p>
+    </header>
+    <div class="moments__grid">
+      {
+        moments.tiles.map((t, i) => {
+          const photo = photoFor(t.product);
+          return (
+            <a class="tile" href={`/menu/${slugOf(t.product)}`} data-tilt data-reveal style={`--i:${i}`}>
+              <div class="tile__media arch">
+                {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360]} sizes="(max-width: 760px) 80vw, 360px" alt="" loading="lazy" />}
+              </div>
+              <p class="script tile__label">{t.label}</p>
+              <p class="tile__line">{t.line}</p>
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .moments {
+    background: var(--beige);
+    overflow: hidden;
+  }
+  .moments :global(.moments__leaf) {
+    position: absolute;
+    right: -40px;
+    top: 40px;
+    width: clamp(160px, 20vw, 280px);
+    color: var(--olive);
+    opacity: 0.55;
+    transform: scaleX(-1) rotate(-8deg);
+  }
+  .moments__head {
+    text-align: center;
+    justify-items: center;
+  }
+  .moments__head .lead {
+    text-align: center;
+  }
+  .moments__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(20px, 3vw, 44px);
+    align-items: start;
+  }
+  .tile {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    text-decoration: none;
+    gap: 6px;
+    transform-style: preserve-3d;
+    perspective: 900px;
+  }
+  .tile:nth-child(2) {
+    margin-top: clamp(0px, 6vw, 80px);
+  }
+  .tile__media {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    box-shadow: var(--shadow);
+    transition: transform 0.6s var(--ease), box-shadow 0.6s var(--ease);
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  }
+  .tile:hover .tile__media {
+    box-shadow: 0 40px 70px -30px rgb(34 21 14 / 50%);
+  }
+  .tile__media :global(img) {
+    transition: transform 1.2s var(--ease);
+  }
+  .tile:hover .tile__media :global(img) {
+    transform: scale(1.06);
+  }
+  .tile__label {
+    margin-top: 18px;
+    font-size: clamp(2.2rem, 3.6vw, 3rem);
+    color: var(--coffee);
+  }
+  .tile__line {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  @media (max-width: 760px) {
+    .moments__grid {
+      grid-template-columns: 1fr;
+      max-width: 340px;
+      margin-inline: auto;
+      gap: 56px;
+    }
+    .tile:nth-child(2) {
+      margin-top: 0;
+    }
+  }
+</style>

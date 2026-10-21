@@ -1,0 +1,413 @@
+/* Essence — design tokens from the POS (lib/app/theme/tokens.dart) + the printed dessert menu. */
+:root {
+  --cream: #f9f5ec;
+  --paper: #fffdf8;
+  --beige: #ede3cf;
+  --sand: #e2d8c3;
+  --olive: #4e5726;
+  --olive-deep: #343a17;
+  --olive-soft: #e4e7cf;
+  --cocoa: #22150e;
+  --cocoa-2: #3a2418;
+  --cocoa-3: #5a3a26;
+  --coffee: #8a5a36;
+  --caramel: #c99366;
+  --gold: #d9b77e;
+  --ink: #2b2118;
+  --muted: #665c4e;
+  --on-dark: #f6efe2;
+  --on-dark-muted: #c9bba5;
+  --success: #2f6a40;
+  --danger: #a23a2e;
+
+  --serif: 'Playfair Display', 'Times New Roman', serif;
+  --sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --script: 'Pinyon Script', 'Snell Roundhand', cursive;
+
+  --gutter: clamp(16px, 4vw, 48px);
+  --max: 1240px;
+  --radius: 22px;
+  --arch: 999px 999px 26px 26px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow: 0 1px 2px rgb(43 33 24 / 6%), 0 12px 32px -12px rgb(43 33 24 / 22%);
+  --nav-h: 72px;
+
+  color-scheme: light;
+}
+
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-h) + 12px);
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 400 1rem/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+a {
+  color: inherit;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+::selection {
+  background: var(--olive);
+  color: var(--cream);
+}
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+[hidden] {
+  display: none !important;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ── Type helpers ── */
+.eyebrow {
+  font: 600 0.72rem/1.2 var(--sans);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--coffee);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+}
+.eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+.script {
+  font-family: var(--script);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.display {
+  font-size: clamp(2.6rem, 7.2vw, 6.4rem);
+}
+.h2 {
+  font-size: clamp(2.1rem, 5vw, 4rem);
+}
+.lead {
+  font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+  color: var(--muted);
+  max-width: 56ch;
+}
+em.accent {
+  font-style: italic;
+  color: var(--olive);
+}
+
+/* ── Buttons ── */
+.btn {
+  --bg: var(--olive);
+  --fg: var(--cream);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 52px;
+  padding: 0 1.6em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 600 0.95rem/1 var(--sans);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), background-color 0.3s;
+  white-space: nowrap;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 22%), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -14px rgb(34 21 14 / 55%);
+}
+.btn:hover::after {
+  opacity: 1;
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.btn--cream {
+  --bg: var(--cream);
+  --fg: var(--cocoa);
+}
+.btn--ghost {
+  --bg: transparent;
+  --fg: currentColor;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+.btn--ghost:hover {
+  box-shadow: inset 0 0 0 1.5px currentColor, 0 14px 30px -18px rgb(34 21 14 / 45%);
+}
+.btn--whatsapp {
+  --bg: #1f8f4e;
+  --fg: #fff;
+}
+.btn--sm {
+  min-height: 40px;
+  padding: 0 1.1em;
+  font-size: 0.85rem;
+}
+.btn--block {
+  width: 100%;
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+.link-arrow svg {
+  transition: transform 0.3s var(--ease);
+}
+.link-arrow:hover svg {
+  transform: translateX(4px);
+}
+
+/* ── Arch frames (from the printed menu) ── */
+.arch {
+  border-radius: var(--arch);
+  overflow: hidden;
+  background: var(--beige);
+  position: relative;
+}
+.arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Grain overlay for dark sections ── */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Reveal on scroll (only hidden when JS + motion are on) ── */
+html.motion [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+html.motion [data-reveal='fade'] {
+  transform: none;
+}
+html.motion [data-reveal='scale'] {
+  transform: scale(0.94);
+}
+html.motion.reveal-fallback [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s, transform 0.6s;
+}
+
+/* ── Leaf line art draw ── */
+.leaf path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html.motion .leaf[data-draw] path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+html.motion .leaf[data-draw].is-drawn path {
+  transition: stroke-dashoffset 2.2s var(--ease);
+  stroke-dashoffset: 0;
+}
+
+/* ── Badges / chips ── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  font: 600 0.75rem/1 var(--sans);
+  letter-spacing: 0.04em;
+  background: var(--olive-soft);
+  color: var(--olive-deep);
+}
+.chip--sold {
+  background: #f2ddd7;
+  color: var(--danger);
+}
+
+/* ── Qty stepper ── */
+.qty {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1.5px var(--sand);
+  background: var(--paper);
+}
+.qty button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: none;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  transition: background-color 0.2s;
+}
+.qty button:hover {
+  background: var(--beige);
+}
+.qty output {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Section rhythm ── */
+.section {
+  padding-block: clamp(80px, 12vw, 160px);
+  position: relative;
+}
+.section-head {
+  display: grid;
+  gap: 18px;
+  margin-bottom: clamp(36px, 6vw, 72px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Add-to-cart toast ── */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100% - 32px);
+  padding: 10px 10px 10px 20px;
+  border-radius: 999px;
+  background: var(--cocoa);
+  color: var(--on-dark);
+  font-size: 0.9rem;
+  box-shadow: 0 20px 50px -20px rgb(0 0 0 / 60%);
+  transform: translate(-50%, 140%);
+  transition: transform 0.6s var(--ease);
+}
+.toast.is-in {
+  transform: translate(-50%, 0);
+}
+.toast button {
+  flex: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--cream);
+  color: var(--cocoa);
+  font-weight: 600;
+  font-size: 0.82rem;
+}

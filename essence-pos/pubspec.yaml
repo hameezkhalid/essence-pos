@@ -54,6 +54,8 @@ dependencies:
   file_selector: ^1.1.0
   qr: ^4.0.0
   http: ^1.6.0
+  url_launcher: ^6.3.3
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:
@@ -85,6 +87,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/menu/
+    - assets/sounds/
 
   fonts:
     - family: Inter

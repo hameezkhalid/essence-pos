@@ -1,0 +1,149 @@
+---
+import Icon from './Icon.astro';
+---
+
+<!-- Sizes and extras for products that have them (filled in by the cart script). -->
+<dialog class="sheet" data-sheet aria-labelledby="sheet-title">
+  <form method="dialog" class="sheet__panel" data-sheet-form>
+    <button class="sheet__close" type="submit" value="cancel" aria-label="Close"><Icon name="close" /></button>
+    <img class="sheet__img" data-sheet-img alt="" width="160" height="180" />
+    <h2 id="sheet-title" data-sheet-title></h2>
+    <p class="sheet__desc" data-sheet-desc></p>
+    <div class="sheet__groups" data-sheet-groups></div>
+    <div class="sheet__foot">
+      <div class="qty" data-sheet-qty>
+        <button type="button" data-step="-1" aria-label="Fewer">−</button>
+        <output>1</output>
+        <button type="button" data-step="1" aria-label="More">+</button>
+      </div>
+      <button class="btn" type="button" data-sheet-add>Add · <span data-sheet-price></span></button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  .sheet {
+    width: min(480px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 0 40px 80px -30px rgb(34 21 14 / 50%);
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    transition: opacity 0.35s, transform 0.45s var(--ease), overlay 0.45s allow-discrete, display 0.45s allow-discrete;
+  }
+  .sheet[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .sheet[open] {
+      opacity: 0;
+      transform: translateY(24px) scale(0.97);
+    }
+  }
+  .sheet::backdrop {
+    background: rgb(34 21 14 / 45%);
+    backdrop-filter: blur(3px);
+  }
+  .sheet__panel {
+    position: relative;
+    padding: 28px 24px 22px;
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    text-align: center;
+  }
+  .sheet__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--beige);
+    display: grid;
+    place-items: center;
+  }
+  .sheet__close :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+  .sheet__img {
+    width: 140px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: var(--arch);
+    background: var(--beige);
+  }
+  .sheet h2 {
+    font-size: 1.8rem;
+  }
+  .sheet__desc {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .sheet__groups {
+    width: 100%;
+    display: grid;
+    gap: 16px;
+    text-align: left;
+    margin-top: 6px;
+  }
+  .sheet__groups :global(fieldset) {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sheet__groups :global(legend) {
+    font: 600 0.72rem/1 var(--sans);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--coffee);
+    margin-bottom: 10px;
+  }
+  .sheet__groups :global(label) {
+    position: relative;
+  }
+  .sheet__groups :global(input) {
+    position: absolute;
+    opacity: 0;
+  }
+  .sheet__groups :global(label span) {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px var(--sand);
+    background: var(--paper);
+    font-size: 0.88rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .sheet__groups :global(input:checked + span) {
+    background: var(--olive);
+    color: var(--cream);
+    box-shadow: none;
+  }
+  .sheet__groups :global(input:focus-visible + span) {
+    outline: 2px solid var(--olive);
+    outline-offset: 2px;
+  }
+  .sheet__foot {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+  }
+  .sheet__foot .btn {
+    flex: 1;
+  }
+</style>

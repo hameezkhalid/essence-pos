@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr/qr.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app/theme/tokens.dart';
 import '../core/printing/receipt_doc.dart';
@@ -26,11 +27,21 @@ class ReceiptPreview extends StatelessWidget {
             final size = l.big ? fontSize * 1.9 : (l.tall ? fontSize * 1.5 : fontSize);
             final cols = l.big ? columns ~/ 2 : columns;
             for (final line in wrapText(l.text, cols)) {
-              children.add(Text(
+              final text = Text(
                 line,
                 textAlign: switch (l.align) { RAlign.left => TextAlign.left, RAlign.center => TextAlign.center, RAlign.right => TextAlign.right },
                 style: base.copyWith(fontSize: size, fontWeight: l.bold || l.big ? FontWeight.w600 : FontWeight.w400, height: l.big ? 1.15 : 1.35),
-              ));
+              );
+              final link = l.link;
+              children.add(link == null
+                  ? text
+                  : MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication),
+                        child: text,
+                      ),
+                    ));
             }
           case RRow():
             for (final line in layoutRow(l.left, l.right, columns, indent: l.indent)) {

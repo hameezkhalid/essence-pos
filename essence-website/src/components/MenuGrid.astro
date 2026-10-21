@@ -1,0 +1,134 @@
+---
+// Menu with category tabs (home preview) or every category as its own section (/menu).
+import ProductCard from './ProductCard.astro';
+import { menu, productsIn } from '../lib/menu';
+import { categoryLines } from '../content/copy';
+
+interface Props { mode: 'tabs' | 'sections' }
+const { mode } = Astro.props;
+const cats = menu.categories.filter((c) => productsIn(c.id).length);
+---
+
+{
+  mode === 'tabs' ? (
+    <div class="menu-tabs" data-tabs>
+      <div class="tabs" role="tablist" aria-label="Dessert categories">
+        {cats.map((c, i) => (
+          <button role="tab" type="button" id={`tab-${c.id}`} aria-controls={`panel-${c.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+            {c.name}
+          </button>
+        ))}
+        <span class="tabs__ink" aria-hidden="true" />
+      </div>
+      {cats.map((c, i) => (
+        <div class="grid" role="tabpanel" id={`panel-${c.id}`} aria-labelledby={`tab-${c.id}`} hidden={i !== 0} data-stagger>
+          {productsIn(c.id).map((p, j) => (
+            <ProductCard product={p} index={j} />
+          ))}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div class="menu-sections">
+      {cats.map((c) => (
+        <section class="cat" id={c.id.replace(/^cat-/, '')} aria-labelledby={`h-${c.id}`}>
+          <header class="cat__head" data-reveal>
+            <h2 id={`h-${c.id}`}>{c.name}</h2>
+            <span class="cat__rule" />
+            {categoryLines[c.id] && <p class="script">{categoryLines[c.id]}</p>}
+          </header>
+          <div class="grid" data-stagger>
+            {productsIn(c.id).map((p, j) => (
+              <ProductCard product={p} index={j} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .tabs {
+    position: relative;
+    display: flex;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto clamp(36px, 5vw, 56px);
+    padding: 6px;
+    border-radius: 999px;
+    background: var(--beige);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs button {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    border: 0;
+    background: none;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: color 0.35s;
+  }
+  .tabs button[aria-selected='true'] {
+    color: var(--cream);
+  }
+  .tabs__ink {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: var(--olive);
+    transition: transform 0.55s var(--ease), width 0.55s var(--ease);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 266px));
+    justify-content: center;
+    gap: clamp(28px, 3vw, 44px) clamp(16px, 2.4vw, 32px);
+  }
+  .menu-sections {
+    display: grid;
+    gap: clamp(80px, 10vw, 130px);
+  }
+  .cat__head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: clamp(32px, 4vw, 52px);
+  }
+  .cat__head h2 {
+    font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+  }
+  .cat__rule {
+    height: 1px;
+    background: var(--sand);
+  }
+  .cat__head .script {
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    color: var(--coffee);
+  }
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .cat__head {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .cat__rule {
+      display: none;
+    }
+    .tabs {
+      margin-inline: 0;
+    }
+  }
+</style>

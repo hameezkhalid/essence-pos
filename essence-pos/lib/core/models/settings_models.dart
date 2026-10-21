@@ -16,6 +16,7 @@ class SettingKeys {
   static const fbr = 'fbr';
   static const security = 'security';
   static const permissions = 'permissions';
+  static const online = 'online';
 }
 
 class StoreSettings {
@@ -293,6 +294,64 @@ class FbrSettings {
       );
 }
 
+/// Pickup orders from the store website (they arrive as held orders tagged WEB).
+class OnlineOrderSettings {
+  const OnlineOrderSettings({
+    this.accepting = false,
+    this.whatsapp = '',
+    this.hours = '',
+    this.sendToBar = false,
+    this.placedTemplate = defaultPlaced,
+    this.readyTemplate = defaultReady,
+    this.cancelledTemplate = defaultCancelled,
+  });
+
+  /// The website takes orders only while this is on (and a till is receiving them).
+  final bool accepting;
+
+  /// Shop WhatsApp number shown on the website, e.g. 03001234567.
+  final String whatsapp;
+
+  /// Opening hours shown on the website, e.g. "Daily 12 pm – 12 am".
+  final String hours;
+
+  /// Print a bar ticket as soon as an online order arrives.
+  final bool sendToBar;
+
+  final String placedTemplate;
+  final String readyTemplate;
+  final String cancelledTemplate;
+
+  static const placeholders = '{name} {code} {items} {subtotal} {store}';
+
+  static const defaultPlaced = 'Hi {name}! Your {store} order #{code} has been placed.\n\n{items}\nSubtotal: {subtotal} '
+      '(GST is added at the counter based on your payment method).\n\n'
+      'Please visit us at {store}, Bahria Town Phase 8 to collect your order. Just show your Order ID #{code}.';
+  static const defaultReady = 'Hi {name}, your {store} order #{code} is ready for pickup. See you soon!';
+  static const defaultCancelled = 'Hi {name}, sorry, we couldn\'t take your {store} order #{code}. '
+      'Please reply here or call us and we\'ll help you out.';
+
+  Map<String, dynamic> toJson() => {
+        'accepting': accepting,
+        'whatsapp': whatsapp,
+        'hours': hours,
+        'sendToBar': sendToBar,
+        'placedTemplate': placedTemplate,
+        'readyTemplate': readyTemplate,
+        'cancelledTemplate': cancelledTemplate,
+      };
+
+  static OnlineOrderSettings fromJson(Map j) => OnlineOrderSettings(
+        accepting: _b(j, 'accepting', false),
+        whatsapp: _s(j, 'whatsapp', ''),
+        hours: _s(j, 'hours', ''),
+        sendToBar: _b(j, 'sendToBar', false),
+        placedTemplate: _s(j, 'placedTemplate', defaultPlaced),
+        readyTemplate: _s(j, 'readyTemplate', defaultReady),
+        cancelledTemplate: _s(j, 'cancelledTemplate', defaultCancelled),
+      );
+}
+
 class SecuritySettings {
   const SecuritySettings({this.autoLockMinutes = 5, this.requireOpenShift = true});
 
@@ -385,6 +444,7 @@ class AppSettings {
     this.fbr = const FbrSettings(),
     this.security = const SecuritySettings(),
     this.permissions = PermissionSettings.defaults,
+    this.online = const OnlineOrderSettings(),
   });
   final StoreSettings store;
   final PricingSettings pricing;
@@ -395,6 +455,7 @@ class AppSettings {
   final FbrSettings fbr;
   final SecuritySettings security;
   final PermissionSettings permissions;
+  final OnlineOrderSettings online;
 
   static AppSettings fromMaps(Map<String, Map<String, dynamic>> m) => AppSettings(
         store: StoreSettings.fromJson(m[SettingKeys.store] ?? const {}),
@@ -406,6 +467,7 @@ class AppSettings {
         fbr: FbrSettings.fromJson(m[SettingKeys.fbr] ?? const {}),
         security: SecuritySettings.fromJson(m[SettingKeys.security] ?? const {}),
         permissions: PermissionSettings.fromJson(m[SettingKeys.permissions] ?? const {}),
+        online: OnlineOrderSettings.fromJson(m[SettingKeys.online] ?? const {}),
       );
 
   Map<String, Map<String, dynamic>> toMaps() => {
@@ -418,5 +480,6 @@ class AppSettings {
         SettingKeys.fbr: fbr.toJson(),
         SettingKeys.security: security.toJson(),
         SettingKeys.permissions: permissions.toJson(),
+        SettingKeys.online: online.toJson(),
       };
 }

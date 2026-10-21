@@ -7,6 +7,7 @@ import '../../app/theme/icons.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/db/database.dart';
 import '../../core/models/menu_models.dart';
+import '../../core/models/order_models.dart';
 import '../../core/money.dart';
 import '../../core/tax/tax_engine.dart';
 import '../../shared/common.dart';
@@ -196,6 +197,7 @@ class _MenuPanel extends ConsumerWidget {
     final compact = ref.watch(gridDensityProvider).value == 'compact';
     final pad = context.isPhone ? Sp.md : Sp.lg;
     final held = ref.watch(heldOrdersProvider).value ?? const [];
+    final web = held.where((o) => o.isWeb).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -234,6 +236,18 @@ class _MenuPanel extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (web > 0) ...[
+                const SizedBox(width: Sp.sm),
+                Badge(
+                  label: Text('$web'),
+                  backgroundColor: ec.success,
+                  child: FilledButton.tonalIcon(
+                    onPressed: () => showHeldOrders(context, ref, webOnly: true),
+                    icon: const Icon(Icons.language_rounded),
+                    label: Text(context.isPhone ? 'Web' : 'Online'),
+                  ),
+                ),
+              ],
               const SizedBox(width: Sp.sm),
               Badge(
                 isLabelVisible: held.isNotEmpty,

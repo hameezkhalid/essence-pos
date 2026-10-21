@@ -41,6 +41,43 @@ service cloud.firestore {
       match /{collection}/{docId} {
         allow read, write: if isMember(storeId);
       }
+
+      // ── Public store website (no sign-in) ──
+      // The menu and the website's store info are public. Staff, settings, orders etc. stay members-only.
+      match /products/{id} {
+        allow read: if true;
+      }
+      match /categories/{id} {
+        allow read: if true;
+      }
+      match /modifierGroups/{id} {
+        allow read: if true;
+      }
+      match /public/{id} {
+        allow read: if true;
+      }
+
+      // Pickup orders from the website: create-only, never readable or editable by the public.
+      // A till turns each one into a held order and prices it from its own menu.
+      match /webOrders/{code} {
+        allow create: if isWebOrder(storeId, code, request.resource.data);
+      }
+    }
+
+    // Order ID: 5 characters without look-alikes (no I, L, O, 0, 1).
+    function isWebOrder(storeId, code, d) {
+      return code.matches('^[A-HJKMNP-Z2-9]{5}$')
+        && d.keys().hasAll(['code', 'phone', 'lines', 'status', 'createdAt'])
+        && d.keys().hasOnly(['code', 'phone', 'name', 'note', 'lines', 'status', 'createdAt', 'subtotal'])
+        && d.code == code
+        && d.phone is string && d.phone.matches('^03[0-9]{9}$')
+        && (!('name' in d) || (d.name is string && d.name.size() <= 40))
+        && (!('note' in d) || (d.note is string && d.note.size() <= 200))
+        && (!('subtotal' in d) || (d.subtotal is int && d.subtotal >= 0 && d.subtotal <= 100000000))
+        && d.lines is list && d.lines.size() >= 1 && d.lines.size() <= 30
+        && d.status == 'new'
+        && d.createdAt == request.time
+        && get(/databases/$(database)/documents/stores/$(storeId)/public/site).data.get('accepting', false) == true;
     }
 
     match /{document=**} {

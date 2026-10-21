@@ -1,0 +1,151 @@
+---
+import { Picture } from 'astro:assets';
+import Leaf from './Leaf.astro';
+import { photoFor } from '../lib/images';
+import { story } from '../content/copy';
+const cake = photoFor('m-chocolate-cake');
+---
+
+<section class="story" id="story" data-story>
+  <div class="story__sticky">
+    <p class="story__bg" aria-hidden="true" data-story-bg>Belgian chocolate</p>
+    <div class="wrap story__grid">
+      <div class="story__media">
+        <div class="story__ring" aria-hidden="true"></div>
+        <div class="arch story__img" data-story-img>
+          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="Slice of Belgian chocolate cake" loading="lazy" />}
+        </div>
+        <Leaf draw class="story__leaf" />
+      </div>
+      <div class="story__copy">
+        <p class="eyebrow">{story.kicker}</p>
+        <ol class="beats">
+          {
+            story.beats.map((b, i) => (
+              <li data-beat style={`--i:${i}`}>
+                <span class="beats__n">0{i + 1}</span>
+                <span class="beats__t">{b}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="lead story__body" data-beat-body>{story.body}</p>
+        <a class="link-arrow" href="/menu/chocolate-cake">Meet the chocolate cake <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story {
+    position: relative;
+    background: var(--cream);
+  }
+  .story__sticky {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding-block: clamp(80px, 10vw, 120px);
+  }
+  :global(html.motion) .story {
+    height: 240svh;
+  }
+  :global(html.motion) .story__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    padding-block: 0;
+  }
+  .story__bg {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    translate: 0 -50%;
+    white-space: nowrap;
+    font: italic 500 clamp(6rem, 18vw, 17rem) / 1 var(--serif);
+    color: rgb(138 90 54 / 7%);
+    pointer-events: none;
+  }
+  .story__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    align-items: center;
+    gap: clamp(40px, 7vw, 110px);
+  }
+  .story__media {
+    position: relative;
+    justify-self: center;
+    width: min(360px, 78vw);
+  }
+  .story__ring {
+    position: absolute;
+    inset: -8% -14%;
+    border-radius: 50%;
+    border: 1px solid var(--sand);
+  }
+  .story__img {
+    aspect-ratio: 3 / 4;
+    box-shadow: 0 50px 90px -40px rgb(34 21 14 / 55%);
+    will-change: transform, clip-path;
+  }
+  .story__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .story__media :global(.story__leaf) {
+    position: absolute;
+    right: -26%;
+    bottom: -10%;
+    width: 46%;
+    color: var(--olive);
+  }
+  .beats {
+    list-style: none;
+    padding: 0;
+    margin: 26px 0 30px;
+    display: grid;
+    gap: 6px;
+  }
+  .beats li {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+  }
+  .beats__n {
+    font: 600 0.75rem/1 var(--sans);
+    letter-spacing: 0.16em;
+    color: var(--coffee);
+    translate: 0 -0.8em;
+  }
+  .beats__t {
+    font: 500 clamp(1.9rem, 4.2vw, 3.6rem) / 1.08 var(--serif);
+    color: var(--ink);
+  }
+  .beats li:nth-child(2) .beats__t {
+    font-style: italic;
+    color: var(--olive);
+  }
+  .story__body {
+    margin-bottom: 26px;
+  }
+  @media (max-width: 860px) {
+    .story__grid {
+      grid-template-columns: 1fr;
+    }
+    .story__media {
+      width: min(300px, 70vw);
+    }
+    :global(html.motion) .story {
+      height: auto;
+    }
+    :global(html.motion) .story__sticky {
+      position: relative;
+      height: auto;
+      padding-block: 90px;
+    }
+  }
+</style>

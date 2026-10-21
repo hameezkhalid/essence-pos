@@ -1,0 +1,169 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { type Product, fromPrice, hasOptions, rs, slugOf } from '../lib/menu';
+import { photoFor } from '../lib/images';
+
+interface Props { product: Product; eager?: boolean; index?: number }
+const { product: p, eager = false, index = 0 } = Astro.props;
+const photo = photoFor(p.id);
+const slug = slugOf(p.id);
+const from = p.sizes.length > 1;
+---
+
+<article class="card" data-product={p.id} data-sold={!p.available ? '' : undefined} style={`--i:${index % 4}`}>
+  <a class="card__media arch" href={`/menu/${slug}`} tabindex="-1" aria-hidden="true">
+    {
+      photo ? (
+        <Picture
+          src={photo}
+          formats={['avif', 'webp']}
+          widths={[180, 360]}
+          sizes="(max-width: 600px) 46vw, 300px"
+          alt=""
+          loading={eager ? 'eager' : 'lazy'}
+          style={`view-transition-name: p-${slug}`}
+        />
+      ) : (
+        <span class="card__fallback">{p.name.slice(0, 1)}</span>
+      )
+    }
+    <span class="chip chip--sold card__sold">Sold out today</span>
+  </a>
+  <div class="card__body">
+    <h3><a href={`/menu/${slug}`}>{p.name}</a></h3>
+    <p class="card__desc">{p.description}</p>
+    <div class="card__row">
+      <span class="card__price">{from && <small>from </small>}<span data-price>{rs(fromPrice(p))}</span></span>
+      <button class="add" type="button" data-add={p.id} data-options={hasOptions(p) ? '' : undefined} aria-label={`Add ${p.name} to cart`} disabled={!p.available}>
+        <Icon name="plus" />
+        <span>Add</span>
+      </button>
+    </div>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: grid;
+    gap: 16px;
+  }
+  .card__media {
+    display: block;
+    aspect-ratio: 5 / 6;
+    box-shadow: var(--shadow);
+    isolation: isolate;
+  }
+  .card__media :global(img) {
+    transition: transform 1.1s var(--ease), filter 0.6s;
+  }
+  .card:hover .card__media :global(img) {
+    transform: scale(1.07);
+  }
+  .card[data-sold] .card__media :global(img) {
+    filter: grayscale(0.7) brightness(0.92);
+  }
+  .card__fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font: 500 4rem/1 var(--serif);
+    color: var(--coffee);
+  }
+  .card__sold {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    translate: -50% 0;
+    display: none;
+  }
+  .card[data-sold] .card__sold {
+    display: inline-flex;
+  }
+  .card__body {
+    display: grid;
+    gap: 6px;
+    text-align: center;
+    justify-items: center;
+  }
+  .card h3 {
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    line-height: 1.15;
+  }
+  .card h3 a {
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    transition: background-size 0.5s var(--ease);
+  }
+  .card:hover h3 a {
+    background-size: 100% 1px;
+  }
+  .card__desc {
+    font-size: 0.86rem;
+    color: var(--muted);
+    max-width: 30ch;
+    line-height: 1.5;
+  }
+  .card__row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .card__price {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .card__price small {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 16px 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--olive);
+    color: var(--cream);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: transform 0.35s var(--ease), background-color 0.3s;
+  }
+  .add :global(svg) {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.4s var(--ease);
+  }
+  .add:hover {
+    transform: translateY(-2px);
+    background: var(--olive-deep);
+  }
+  .add:hover :global(svg) {
+    transform: rotate(90deg);
+  }
+  .add:disabled {
+    background: var(--sand);
+    color: var(--muted);
+  }
+  .add.is-added {
+    background: var(--coffee);
+  }
+  @media (max-width: 600px) {
+    .card__desc {
+      display: none;
+    }
+    .add span {
+      display: none;
+    }
+    .add {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+</style>

@@ -1,0 +1,157 @@
+---
+import '@fontsource/playfair-display/500.css';
+import '@fontsource/playfair-display/500-italic.css';
+import '@fontsource/playfair-display/600.css';
+import '@fontsource-variable/inter';
+import '@fontsource/pinyon-script/400.css';
+import '../styles/global.css';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import CartDrawer from '../components/CartDrawer.astro';
+import ProductSheet from '../components/ProductSheet.astro';
+import { site } from '../site.config';
+import { menu, slugOf } from '../lib/menu';
+import { thumbFor } from '../lib/images';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path for the canonical URL, e.g. /menu */
+  path: string;
+  image?: string;
+  schema?: Record<string, unknown>[];
+  /** LCP image to preload. */
+  preload?: string;
+  dark?: boolean;
+}
+
+const { title, description, path, image = '/og-image.jpg', schema = [], preload, dark = false } = Astro.props;
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(image, site.url).href;
+
+// The browser needs the menu (prices, options, thumbnails) for the cart; prices refresh live from the POS.
+const menuData = {
+  products: await Promise.all(menu.products.map(async (p) => ({ ...p, thumb: await thumbFor(p.id), url: `/menu/${slugOf(p.id)}` }))),
+  modifierGroups: menu.modifierGroups,
+};
+
+const business = {
+  '@type': 'Bakery',
+  '@id': `${site.url}/#business`,
+  name: site.name,
+  description: 'Belgian chocolate cakes, cheesecakes, tiramisu and freshly baked desserts in Bahria Town Phase 8, Rawalpindi.',
+  url: site.url,
+  image: `${site.url}/og-image.jpg`,
+  logo: `${site.url}/icon-512.png`,
+  servesCuisine: ['Desserts', 'Cakes', 'Bakery', 'Coffee'],
+  priceRange: 'Rs',
+  hasMenu: `${site.url}/menu`,
+  acceptsReservations: false,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address,
+    addressLocality: site.city,
+    addressRegion: site.region,
+    addressCountry: 'PK',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  areaServed: ['Bahria Town Phase 8', 'Bahria Town', 'Rawalpindi', 'Islamabad'],
+  ...(site.phone || site.whatsapp ? { telephone: site.phone || site.whatsapp } : {}),
+  ...(site.instagram ? { sameAs: [`https://www.instagram.com/${site.instagram}`] } : {}),
+  ...(site.openingHours.length
+    ? { openingHoursSpecification: site.openingHours.map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.days, opens: h.opens, closes: h.closes })) }
+    : {}),
+};
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${site.url}/#website`, url: site.url, name: site.name, inLanguage: 'en-PK', publisher: { '@id': `${site.url}/#business` } },
+    business,
+    ...schema,
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en-PK">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content={dark ? '#22150e' : '#f9f5ec'} />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="geo.region" content="PK-PB" />
+    <meta name="geo.placename" content={`${site.area}, ${site.city}`} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+    {preload && <link rel="preload" as="image" href={preload} fetchpriority="high" />}
+
+    <script is:inline>
+      (() => {
+        const d = document.documentElement;
+        d.classList.add('js');
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('motion');
+          // If the animation code can't load, never leave content hidden.
+          setTimeout(() => window.__motionReady || d.classList.add('reveal-fallback'), 2500);
+        }
+      })();
+    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+  </head>
+  <body class={dark ? 'is-dark-top' : ''}>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav dark={dark} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <CartDrawer />
+    <ProductSheet />
+    <script type="application/json" id="menu-data" set:html={JSON.stringify(menuData)} />
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: fixed;
+    left: 16px;
+    top: -60px;
+    z-index: 100;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--olive);
+    color: var(--cream);
+    text-decoration: none;
+    transition: top 0.2s;
+  }
+  .skip:focus {
+    top: 12px;
+  }
+</style>

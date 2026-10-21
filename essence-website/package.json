@@ -1,0 +1,35 @@
+{
+  "name": "essence-website",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "menu": "node scripts/fetch-menu.mjs",
+    "icons": "node scripts/make-icons.mjs",
+    "dev": "astro dev",
+    "build": "node scripts/fetch-menu.mjs && astro build",
+    "build:offline": "astro build",
+    "preview": "astro preview",
+    "test:rules": "cd ../essence-pos && firebase emulators:exec --only firestore --project demo-essence \"node --test ../essence-website/tests/rules.test.mjs\"",
+    "check": "astro check",
+    "test:e2e": "node tests/e2e-order.mjs",
+    "screens": "node tests/screens.mjs screens"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/pinyon-script": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
+    "astro": "^7.4.1",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.27",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.11",
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.0.0",
+    "puppeteer-core": "^25.15.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,28 @@
+---
+// Olive sprig line art (from the printed menu). Draws itself in when `draw` is set.
+interface Props { class?: string; draw?: boolean; variant?: 'sprig' | 'twin' }
+const { class: cls = '', draw = false, variant = 'sprig' } = Astro.props;
+---
+
+{
+  variant === 'twin' ? (
+    <svg class={`leaf ${cls}`} viewBox="0 0 40 24" aria-hidden="true" data-draw={draw ? '' : undefined}>
+      <path pathLength="1" d="M20 22 C20 16 20 12 20 8" />
+      <path pathLength="1" d="M20 14 C15 14 10 11 8 5 C14 5 18 8 20 14 Z" />
+      <path pathLength="1" d="M20 14 C25 14 30 11 32 5 C26 5 22 8 20 14 Z" />
+      <path pathLength="1" d="M20 9 C18 6 18 3 20 1 C22 3 22 6 20 9 Z" />
+    </svg>
+  ) : (
+    <svg class={`leaf ${cls}`} viewBox="0 0 220 260" aria-hidden="true" data-draw={draw ? '' : undefined}>
+      <path pathLength="1" d="M40 250 C70 200 95 150 120 110 C140 78 160 50 190 18" />
+      <path pathLength="1" d="M70 196 C50 190 30 172 26 146 C50 150 66 170 70 196 Z" />
+      <path pathLength="1" d="M74 190 C96 178 112 156 112 128 C92 140 78 162 74 190 Z" />
+      <path pathLength="1" d="M96 150 C76 142 60 122 58 96 C80 102 94 124 96 150 Z" />
+      <path pathLength="1" d="M102 140 C124 130 140 108 142 82 C120 92 106 114 102 140 Z" />
+      <path pathLength="1" d="M128 104 C110 94 98 74 98 50 C118 58 128 80 128 104 Z" />
+      <path pathLength="1" d="M134 96 C154 86 168 66 170 42 C150 50 138 72 134 96 Z" />
+      <path pathLength="1" d="M160 60 C150 46 148 28 156 12 C168 26 168 44 160 60 Z" />
+      <path pathLength="1" d="M70 196 C56 182 48 168 46 156 M74 190 C88 176 98 160 104 142 M96 150 C86 134 76 120 70 108 M102 140 C116 126 126 110 132 94 M128 104 C118 88 110 74 106 62 M134 96 C148 80 156 66 160 54" />
+    </svg>
+  )
+}

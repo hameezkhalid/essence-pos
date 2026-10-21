@@ -1,0 +1,82 @@
+---
+import Leaf from './Leaf.astro';
+import { marquee } from '../content/copy';
+const items = [...marquee, ...marquee];
+
+// Chocolate drips hanging from the hero into the band: [x, width, depth].
+const drips: [number, number, number][] = [
+  [40, 46, 38], [150, 30, 64], [260, 58, 30], [380, 34, 82], [470, 44, 46], [600, 28, 58], [700, 62, 34], [830, 36, 74],
+  [930, 48, 40], [1050, 30, 88], [1150, 54, 36], [1270, 34, 60], [1360, 46, 44],
+];
+const base = 14;
+let d = `M0 0H1440V${base}`;
+for (const [x, w, depth] of [...drips].reverse()) {
+  const r = x + w;
+  d += `L${r} ${base}C${r - w * 0.18} ${base} ${r - w * 0.12} ${depth} ${x + w / 2} ${depth + 6}C${x + w * 0.12} ${depth} ${x + w * 0.18} ${base} ${x} ${base}`;
+}
+d += `L0 ${base}Z`;
+---
+
+<section class="marquee" aria-label="Essence highlights">
+  <svg class="marquee__drip" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true">
+    <path data-drip d={d}></path>
+  </svg>
+  <div class="marquee__track" data-marquee>
+    {
+      [0, 1].map((n) => (
+        <div class="marquee__row" aria-hidden={n === 1 ? 'true' : undefined}>
+          {items.map((t) => (
+            <>
+              <span class="marquee__item">{t}</span>
+              <Leaf variant="twin" class="marquee__leaf" />
+            </>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .marquee {
+    position: relative;
+    background: var(--olive);
+    color: var(--cream);
+    padding: clamp(70px, 8vw, 110px) 0 44px;
+    overflow: hidden;
+  }
+  .marquee__drip {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(44px, 6.4vw, 100px);
+    fill: var(--cocoa);
+  }
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+  .marquee__row {
+    display: flex;
+    align-items: center;
+    flex: none;
+    animation: marquee 38s linear infinite;
+  }
+  .marquee__item {
+    font: italic 500 clamp(2rem, 5vw, 4.2rem) / 1 var(--serif);
+    white-space: nowrap;
+    padding-inline: 0.45em;
+  }
+  .marquee__row :global(.marquee__leaf) {
+    width: clamp(28px, 3.4vw, 48px);
+    color: var(--gold);
+    flex: none;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>

@@ -1,0 +1,132 @@
+---
+import Icon from './Icon.astro';
+import { pickup } from '../content/copy';
+---
+
+<section class="pickup-sec section grain" id="pickup">
+  <div class="wrap">
+    <header class="section-head pickup-sec__head">
+      <p class="eyebrow" data-reveal>How pickup works</p>
+      <h2 class="h2" data-reveal>{pickup.title}</h2>
+    </header>
+    <ol class="steps" data-steps>
+      <svg class="steps__line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 20 C160 0 330 40 500 20 S840 0 1000 20" pathLength="1" data-steps-line></path>
+      </svg>
+      {
+        pickup.steps.map((s, i) => (
+          <li class="step" data-reveal style={`--i:${i}`}>
+            <span class="step__n">{i + 1}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="pickup-sec__note" data-reveal>
+      <p><Icon name="bag" /> {pickup.banner}</p>
+      <a class="btn btn--cream" href="/menu" data-magnetic>Start your order <Icon name="arrow" /></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pickup-sec {
+    background: var(--olive-deep);
+    color: var(--on-dark);
+    overflow: hidden;
+  }
+  .pickup-sec .eyebrow {
+    color: var(--gold);
+  }
+  .pickup-sec__head {
+    text-align: center;
+    justify-items: center;
+  }
+  .steps {
+    position: relative;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .steps__line {
+    position: absolute;
+    left: 16%;
+    right: 16%;
+    top: 34px;
+    width: 68%;
+    height: 40px;
+  }
+  .steps__line path {
+    fill: none;
+    stroke: rgb(217 183 126 / 55%);
+    stroke-width: 1.5;
+    stroke-dasharray: 0.012 0.008;
+  }
+  .step {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .step__n {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--olive-deep);
+    box-shadow: inset 0 0 0 1px rgb(217 183 126 / 55%);
+    font: italic 500 2.4rem/1 var(--serif);
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .step h3 {
+    font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  }
+  .step p {
+    color: var(--on-dark-muted);
+  }
+  .pickup-sec__note {
+    margin-top: clamp(56px, 7vw, 90px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 26px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 7%);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+  }
+  .pickup-sec__note p {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+  }
+  .pickup-sec__note :global(svg) {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: var(--gold);
+  }
+  @media (max-width: 760px) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 44px;
+    }
+    .steps__line {
+      display: none;
+    }
+    .pickup-sec__note {
+      border-radius: 28px;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

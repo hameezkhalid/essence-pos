@@ -18,6 +18,8 @@ import 'package:essence_pos/core/services/reports.dart';
 import 'package:essence_pos/core/services/shift_service.dart';
 import 'package:essence_pos/core/sync/remote_store.dart';
 import 'package:essence_pos/core/sync/sync_engine.dart';
+import 'package:essence_pos/core/sync/web_order_inbox.dart';
+import 'package:essence_pos/core/services/web_order_intake.dart';
 import 'package:essence_pos/core/tax/tax_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -60,6 +62,38 @@ class FakeRemote implements RemoteStore {
 
   @override
   Future<void> setNetworkEnabled(bool enabled) async {}
+}
+
+/// In-memory website inbox: tracks claims and status changes.
+class FakeInbox implements WebOrderInbox {
+  final status = <String, String>{};
+  final claimedBy = <String, String>{};
+  final site = <String, dynamic>{};
+
+  @override
+  Stream<List<WebOrderDoc>> watchPending(String deviceId) => const Stream.empty();
+
+  @override
+  Future<bool> claim(String code, String deviceId) async {
+    final s = status[code] ?? 'new';
+    if (s == 'claimed' && claimedBy[code] == deviceId) return true;
+    if (s != 'new') return false;
+    status[code] = 'claimed';
+    claimedBy[code] = deviceId;
+    return true;
+  }
+
+  @override
+  Future<void> markInPos(String code, {required String orderId, required int subtotal}) async => status[code] = 'inPos';
+
+  @override
+  Future<void> markCancelled(String code) async => status[code] = 'cancelled';
+
+  @override
+  Future<void> heartbeat(String deviceCode) async => site['intakeDevice'] = deviceCode;
+
+  @override
+  Future<void> publishSite(Map<String, dynamic> data) async => site.addAll(data);
 }
 
 Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 400));
@@ -217,6 +251,86 @@ void main() {
     expect(paid.id, held.id);
     expect(paid.token, held.token);
     expect(await pos.watchHeld().first, isEmpty);
+  });
+
+  test('web order lines are priced from the POS menu and checked', () async {
+    final products = {for (final p in await db.select(db.products).get()) p.id: p};
+    final groups = {for (final g in await db.select(db.modifierGroups).get()) g.id: g};
+    final soldOut = products['croissant']!.copyWith(available: false);
+    final r = mapWebLines('K7QX2', const [
+      WebOrderLine(productId: 'latte', qty: 2, sizeCode: 'L', optionIds: ['oat', 'not-an-option']),
+      WebOrderLine(productId: 'latte', qty: 1, sizeCode: 'L', optionIds: ['oat']),
+      WebOrderLine(productId: 'americano', qty: 99, sizeCode: 'XXL'),
+      WebOrderLine(productId: 'croissant', qty: 1),
+      WebOrderLine(productId: 'no-such-thing', qty: 1),
+    ], {...products, 'croissant': soldOut}, groups);
+    expect(r.lines, hasLength(3));
+    final latte = r.lines.first;
+    expect(latte.qty, 3, reason: 'identical lines merge');
+    expect(latte.size?.code, 'L');
+    expect(latte.modifiers.map((m) => m.option.id), ['oat']);
+    expect(latte.unitPrice, 65000 + 15000 + latte.modifiers.single.option.delta);
+    expect(r.lines[1].qty, 20, reason: 'qty is clamped');
+    expect(r.lines[1].size?.code, 'M', reason: 'unknown size falls back to the default');
+    expect(r.issues, containsAll([contains('Americano: size changed'), contains('sold out'), contains('no longer on the menu')]));
+  });
+
+  test('web order arrives as one held WEB order; checkout keeps the web id', () async {
+    final inbox = FakeInbox();
+    final intake = WebOrderIntake(db, pos, inbox, device);
+    const doc = WebOrderDoc(
+      code: 'K7QX2',
+      phone: '03001234567',
+      name: 'Ayesha',
+      note: 'Birthday candle please',
+      lines: [WebOrderLine(productId: 'croissant', qty: 2)],
+    );
+    final held = await intake.receive(doc);
+    expect(held, isNotNull);
+    expect(held!.id, 'web-K7QX2');
+    expect(held.isWeb, isTrue);
+    expect(held.webCode, 'K7QX2');
+    expect(held.status, OrderStatus.held);
+    expect(held.orderType, 'takeaway');
+    expect(held.customerPhone, '03001234567');
+    expect(held.note, contains('Birthday candle please'));
+    expect(held.itemsGross, 2 * (await (db.select(db.products)..where((p) => p.id.equals('croissant'))).getSingle()).price);
+    expect(inbox.status['K7QX2'], 'inPos');
+
+    // A second delivery of the same order (another snapshot, a restart) never duplicates it.
+    expect(await intake.receive(doc), isNull);
+    expect((await pos.watchHeld().first).where((o) => o.isWeb), hasLength(1));
+
+    // Another till can't take an order this till already claimed.
+    final other = FakeInbox()..status['ZZZZ9'] = 'claimed'..claimedBy['ZZZZ9'] = 'dev-2';
+    expect(await WebOrderIntake(db, pos, other, device).receive(const WebOrderDoc(code: 'ZZZZ9', phone: '03001234567', lines: [WebOrderLine(productId: 'croissant', qty: 1)])), isNull);
+
+    final paid = await pos.checkout(
+      cart: CartState.fromOrder(held),
+      portions: const [PaymentPortionInput(methodId: 'cash', methodName: 'Cash', group: RateGroup.cash)],
+      tenderedByPortion: const {},
+      staff: await cashier(),
+      shift: null,
+    );
+    expect(paid.id, 'web-K7QX2');
+    expect(paid.isWeb, isTrue);
+    expect(paid.staffId, 'cashier', reason: 'the cashier who takes payment replaces the Website placeholder');
+    intake.dispose();
+  });
+
+  test('WhatsApp helpers: numbers and templates', () async {
+    expect(waNumber('0300-1234567'), '923001234567');
+    expect(waNumber('+92 300 1234567'), '923001234567');
+    expect(waNumber('3001234567'), '923001234567');
+    final inbox = FakeInbox();
+    final held = (await WebOrderIntake(db, pos, inbox, device).receive(
+      const WebOrderDoc(code: 'ABCDE', phone: '03001234567', name: 'Ali Khan', lines: [WebOrderLine(productId: 'croissant', qty: 1)]),
+    ))!;
+    final msg = fillTemplate(const OnlineOrderSettings().placedTemplate, held, ctx.settings);
+    expect(msg, startsWith('Hi Ali!'));
+    expect(msg, contains('#ABCDE'));
+    expect(msg, contains('1× '));
+    expect(whatsAppUri('03001234567', 'Hi').toString(), 'https://wa.me/923001234567?text=Hi');
   });
 
   test('shift summary: expected cash includes float, cash sales and paid-outs', () async {

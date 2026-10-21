@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,9 @@ import '../../core/models/menu_models.dart';
 import '../../core/models/settings_models.dart';
 import '../../core/services/inventory_service.dart';
 import '../../core/services/pos_service.dart';
+import '../../core/services/web_order_intake.dart';
+import '../../core/money.dart';
+import '../sell/sell_dialogs.dart';
 import '../../shared/approval.dart';
 import '../../shared/common.dart';
 import '../lock/lock_screen.dart';
@@ -70,12 +74,15 @@ class _AppShellState extends ConsumerState<AppShell> {
     final svc = ref.read(servicesProvider);
     _subs.add(svc.pos.notices.listen(_onNotice));
     _subs.add(svc.inventory.alerts.listen(_onStockAlert));
+    final web = svc.webOrders;
+    if (web != null) _subs.add(web.events.listen(_onWebOrder));
     _resetIdle();
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeAskShift());
   }
 
   @override
   void dispose() {
+    _chime?.dispose();
     _idle?.cancel();
     for (final s in _subs) {
       s.cancel();
@@ -85,6 +92,29 @@ class _AppShellState extends ConsumerState<AppShell> {
 
   void _onNotice(PrintNotice n) {
     if (mounted) toast(context, n.message, error: n.error, icon: n.error ? Icons.print_disabled_outlined : Icons.print_outlined);
+  }
+
+  AudioPlayer? _chime;
+
+  Future<void> _onWebOrder(WebOrderArrived e) async {
+    if (!mounted) return;
+    toast(
+      context,
+      'New online order #${e.code} · ${e.order.customerName ?? ''} · ${rs(e.order.itemsGross)}',
+      icon: Icons.language_rounded,
+      duration: const Duration(seconds: 12),
+      action: SnackBarAction(
+        label: 'View',
+        onPressed: () {
+          context.go('/sell');
+          showHeldOrders(context, ref, webOnly: true);
+        },
+      ),
+    );
+    try {
+      _chime ??= AudioPlayer();
+      await _chime!.play(AssetSource('sounds/chime.wav'));
+    } catch (_) {}
   }
 
   void _onStockAlert(LowStockAlert a) {

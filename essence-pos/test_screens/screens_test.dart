@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:essence_pos/app/providers.dart';
 import 'package:essence_pos/core/db/database.dart';
+import 'package:essence_pos/core/models/cart.dart';
+import 'package:essence_pos/core/models/order_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -69,6 +73,45 @@ void main() {
       await teardown(tester, s);
     });
   }
+
+  testWidgets('online orders settings', (tester) async {
+    final s = await bootApp(tester, size: desktop);
+    await s.go('/settings/online');
+    await s.snap('settings_online_desktop_light');
+    await teardown(tester, s);
+  });
+
+  testWidgets('online order waiting on the sell screen', (tester) async {
+    final s = await bootApp(tester, size: desktop);
+    final db = s.services.db;
+    late CartState cart;
+    late StaffMember staff;
+    await s.tester.runAsync(() async {
+      final croissant = await (db.select(db.products)..where((p) => p.id.equals('croissant'))).getSingle();
+      staff = await (db.select(db.staff)..where((x) => x.id.equals('cashier'))).getSingle();
+      cart = CartState(
+        lines: [OrderLine(key: 'a', productId: croissant.id, categoryId: croissant.categoryId, name: croissant.name, basePrice: croissant.price, qty: 2)],
+        customerName: 'Ayesha',
+        customerPhone: '03001234567',
+        note: 'Website pickup #K7QX2',
+        heldOrderId: 'web-K7QX2',
+      );
+    });
+    // The write's transaction interleaves with the app's live queries, so pump while it runs.
+    var done = false;
+    unawaited(s.services.pos.hold(cart, staff: staff).then((_) => done = true));
+    for (var i = 0; i < 100 && !done; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    expect(done, isTrue);
+    await s.settle(1200);
+    await s.snap('sell_online_badge_desktop_light');
+    await tester.tap(find.byIcon(Icons.language_rounded).first);
+    await s.settle(1200);
+    await s.snap('held_online_desktop_light');
+    await teardown(tester, s);
+  });
 
   // Keep StaffMember import used for analyzer.
   test('types', () => expect(StaffMember, isNotNull));

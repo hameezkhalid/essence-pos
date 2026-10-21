@@ -1,0 +1,149 @@
+---
+import Icon from './Icon.astro';
+import Leaf from './Leaf.astro';
+import { site } from '../site.config';
+import { menu, slugOf } from '../lib/menu';
+import { closing } from '../content/copy';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer grain">
+  <div class="wrap footer__top">
+    <div class="footer__intro">
+      <p class="script footer__script">Good food · Good mood</p>
+      <p class="footer__closing">{closing}</p>
+      <a class="btn btn--cream" href="/menu">Order for pickup <Icon name="arrow" /></a>
+    </div>
+    <nav class="footer__col" aria-label="Desserts">
+      <h2>Desserts</h2>
+      {menu.products.slice(0, 6).map((p) => <a href={`/menu/${slugOf(p.id)}`}>{p.name}</a>)}
+      <a href="/menu">Full menu</a>
+    </nav>
+    <div class="footer__col">
+      <h2>Visit</h2>
+      <p data-live="address">{site.address}</p>
+      <p data-live="hours" hidden={!site.hours}>{site.hours}</p>
+      <a href={site.mapsUrl} target="_blank" rel="noopener">Get directions</a>
+      <a data-live="whatsapp-link" href={site.whatsapp ? `https://wa.me/92${site.whatsapp.replace(/\D/g, '').replace(/^0/, '')}` : '#'} target="_blank" rel="noopener" hidden={!site.whatsapp}>
+        WhatsApp us
+      </a>
+      {
+        site.instagram && (
+          <a href={`https://www.instagram.com/${site.instagram}`} target="_blank" rel="noopener">
+            Instagram @{site.instagram}
+          </a>
+        )
+      }
+    </div>
+  </div>
+  <div class="footer__mark" aria-hidden="true">
+    <span data-mark>Essence</span>
+    <Leaf variant="twin" class="footer__leaf" />
+  </div>
+  <div class="wrap footer__base">
+    <p>© {year} Essence · Patisserie, Coffee & Dessert · {site.area}, {site.city}</p>
+    <p>Pickup orders only · Pay at the counter</p>
+    <p class="footer__credit">Powered by <a href="https://nibnox.com" target="_blank" rel="noopener">Nibnox (SMC-Private) Ltd.</a></p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    background: var(--cocoa);
+    color: var(--on-dark);
+    padding-top: clamp(72px, 10vw, 120px);
+    overflow: hidden;
+  }
+  .footer__top {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 48px;
+  }
+  .footer__script {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .footer__closing {
+    font: 500 clamp(1.3rem, 2.2vw, 1.7rem) / 1.35 var(--serif);
+    max-width: 26ch;
+    margin-bottom: 28px;
+  }
+  .footer__col {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    color: var(--on-dark-muted);
+  }
+  .footer__col h2 {
+    font: 600 0.72rem/1 var(--sans);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .footer__col a {
+    text-decoration: none;
+    width: fit-content;
+    transition: color 0.2s;
+  }
+  .footer__col a:hover {
+    color: var(--on-dark);
+  }
+  .footer__mark {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: clamp(48px, 8vw, 96px);
+    font: 500 clamp(5rem, 22vw, 20rem) / 0.8 var(--serif);
+    letter-spacing: -0.02em;
+    color: rgb(246 239 226 / 7%);
+    user-select: none;
+  }
+  .footer__mark :global(.footer__leaf) {
+    width: clamp(40px, 8vw, 120px);
+    color: rgb(217 183 126 / 55%);
+  }
+  .footer__base {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-block: 28px;
+    border-top: 1px solid rgb(246 239 226 / 12%);
+    font-size: 0.82rem;
+    color: var(--on-dark-muted);
+  }
+  .footer__credit {
+    flex-basis: 100%;
+    text-align: center;
+    padding-top: 14px;
+    border-top: 1px solid rgb(246 239 226 / 8%);
+  }
+  .footer__credit a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid rgb(217 183 126 / 40%);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .footer__credit a:hover {
+    color: var(--on-dark);
+    border-color: currentColor;
+  }
+  @media (max-width: 860px) {
+    .footer__top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .footer__intro {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 520px) {
+    .footer__top {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../site.config';
+import { visit } from '../content/copy';
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(`${site.name} ${site.address}`)}&z=15&output=embed`;
+---
+
+<section class="visit section" id="visit">
+  <div class="wrap visit__grid">
+    <div class="visit__copy">
+      <p class="eyebrow" data-reveal>Visit Essence</p>
+      <h2 class="visit__title" data-reveal>{visit.title} <em class="accent">{visit.sub}</em></h2>
+      <ul class="facts" data-reveal>
+        <li><Icon name="pin" /><span data-live="address">{site.address}</span></li>
+        <li data-live-row="hours" hidden={!site.hours}><Icon name="clock" /><span data-live="hours">{site.hours}</span></li>
+        <li data-live-row="whatsapp" hidden={!site.whatsapp}><Icon name="whatsapp" /><span data-live="whatsapp">{site.whatsapp}</span></li>
+      </ul>
+      <div class="visit__ctas" data-reveal>
+        <a class="btn" href={site.mapsUrl} target="_blank" rel="noopener" data-magnetic><Icon name="pin" /> Get directions</a>
+        <a class="btn btn--whatsapp" data-live="whatsapp-link" href="#" target="_blank" rel="noopener" hidden={!site.whatsapp}><Icon name="whatsapp" /> WhatsApp us</a>
+      </div>
+    </div>
+    <div class="visit__map arch" data-reveal="scale">
+      <iframe title="Map to Essence, Bahria Town Phase 8" src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit__grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+  }
+  .visit__title {
+    font-size: clamp(2rem, 4vw, 3.3rem);
+  }
+  .visit__copy {
+    display: grid;
+    gap: 26px;
+  }
+  .facts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+    font-size: 1.05rem;
+  }
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .facts :global(svg) {
+    width: 22px;
+    height: 22px;
+    color: var(--olive);
+    flex: none;
+  }
+  .visit__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .visit__map {
+    aspect-ratio: 4 / 5;
+    max-height: 620px;
+    box-shadow: var(--shadow);
+  }
+  .visit__map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: sepia(0.25) saturate(0.85) contrast(0.95);
+  }
+  @media (max-width: 860px) {
+    .visit__grid {
+      grid-template-columns: 1fr;
+    }
+    .visit__map {
+      aspect-ratio: 1;
+    }
+  }
+</style>

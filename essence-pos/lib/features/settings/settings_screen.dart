@@ -14,6 +14,7 @@ import 'sections/charges_section.dart';
 import 'sections/data_section.dart';
 import 'sections/discounts_section.dart';
 import 'sections/fbr_section.dart';
+import 'sections/online_section.dart';
 import 'sections/orders_section.dart';
 import 'sections/payments_section.dart';
 import 'sections/printers_section.dart';
@@ -79,6 +80,14 @@ const settingsSections = [
     'Store',
     perm: Perm.manageSettings,
     hint: 'Dine-in, takeaway, floor plan',
+  ),
+  SettingsSection(
+    'online',
+    'Online orders',
+    Icons.language_rounded,
+    'Store',
+    perm: Perm.manageSettings,
+    hint: 'Website pickup, WhatsApp',
   ),
   SettingsSection(
     'charges',
@@ -313,6 +322,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       'tax' => const TaxSection(),
       'payments' => const PaymentsSection(),
       'orders' => const OrdersSection(),
+      'online' => const OnlineSection(),
       'charges' => const ChargesSection(),
       'discounts' => const DiscountsSection(),
       'receipt' => const ReceiptSection(),

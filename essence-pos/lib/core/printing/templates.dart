@@ -126,7 +126,10 @@ ReceiptDoc buildReceipt(Order o, AppSettings s, {bool reprint = false}) {
 
   out.add(const RDivider());
   if (s.receipt.footer.trim().isNotEmpty) out.add(RText(s.receipt.footer.trim(), align: RAlign.center));
-  out.add(const RText('Powered by NIBNOX', align: RAlign.center));
+  out.addAll(const [
+    RText('Powered by Nibnox (SMC-Private) Ltd.', align: RAlign.center, link: 'https://nibnox.com'),
+    RText('nibnox.com', align: RAlign.center, link: 'https://nibnox.com'),
+  ]);
   return ReceiptDoc(out, title: 'Receipt ${o.displayNumber}');
 }
 
