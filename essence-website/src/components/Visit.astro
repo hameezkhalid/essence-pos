@@ -1,8 +1,9 @@
 ---
 import Icon from './Icon.astro';
+import Social from './Social.astro';
 import { site } from '../site.config';
 import { visit } from '../content/copy';
-const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(`${site.name} ${site.address}`)}&z=15&output=embed`;
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=16&output=embed`;
 ---
 
 <section class="visit section" id="visit">
@@ -18,6 +19,10 @@ const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(`${site.name}
       <div class="visit__ctas" data-reveal>
         <a class="btn" href={site.mapsUrl} target="_blank" rel="noopener" data-magnetic><Icon name="pin" /> Get directions</a>
         <a class="btn btn--whatsapp" data-live="whatsapp-link" href="#" target="_blank" rel="noopener" hidden={!site.whatsapp}><Icon name="whatsapp" /> WhatsApp us</a>
+      </div>
+      <div class="visit__social" data-reveal>
+        <p class="eyebrow">Follow along</p>
+        <Social labels class="visit__social-links" />
       </div>
     </div>
     <div class="visit__map arch" data-reveal="scale">
@@ -63,6 +68,13 @@ const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(`${site.name}
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+  .visit__social {
+    display: grid;
+    gap: 14px;
+  }
+  .visit__social :global(.visit__social-links) {
+    color: var(--olive);
   }
   .visit__map {
     aspect-ratio: 4 / 5;

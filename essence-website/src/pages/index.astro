@@ -8,6 +8,7 @@ import Moments from '../components/Moments.astro';
 import Pickup from '../components/Pickup.astro';
 import Visit from '../components/Visit.astro';
 import Icon from '../components/Icon.astro';
+import Leaf from '../components/Leaf.astro';
 import { seo } from '../content/copy';
 ---
 
@@ -16,7 +17,9 @@ import { seo } from '../content/copy';
   <Marquee />
   <Story />
 
-  <section class="section home-menu" id="menu">
+  <section class="section home-menu textured" id="menu">
+    <Leaf draw class="sprig sprig--tl" />
+    <Leaf draw class="sprig sprig--br" />
     <div class="wrap">
       <header class="section-head home-menu__head">
         <p class="eyebrow" data-reveal>The menu</p>

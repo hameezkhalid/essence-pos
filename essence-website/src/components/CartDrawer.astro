@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import WaAsk from './WaAsk.astro';
 import { pickup } from '../content/copy';
 ---
 
@@ -56,18 +57,17 @@ import { pickup } from '../content/copy';
           <p class="done__code" data-done-code>#·····</p>
           <p class="done__lead">Show this Order ID at the counter.</p>
           <p class="done__text">We’ll send a WhatsApp confirmation to <strong data-done-phone></strong> shortly. Then visit us in Bahria Town Phase 8 to collect your order.</p>
-          <a class="btn btn--whatsapp btn--block" data-done-wa href="#" target="_blank" rel="noopener" hidden><Icon name="whatsapp" /> Message us on WhatsApp</a>
+          <a class="btn btn--whatsapp btn--block" data-done-wa href="#" target="_blank" rel="noopener" hidden><Icon name="whatsapp" /> Ask about your order on WhatsApp</a>
           <a class="btn btn--ghost btn--block" href="/#visit" data-close-cart><Icon name="pin" /> Get directions</a>
         </div>
       </section>
     </div>
 
     <footer class="drawer__foot" data-foot>
-      <div class="totals">
-        <span>Subtotal</span>
-        <strong data-subtotal>Rs 0</strong>
+      <div class="foot-note">
+        <p>{pickup.confirm}</p>
+        <WaAsk message="I have a question about an order." label="Ask us" />
       </div>
-      <p class="tax-note">{pickup.tax}</p>
       <p class="paused" data-paused hidden></p>
       <button class="btn btn--block" type="button" data-next>Continue</button>
     </footer>
@@ -223,9 +223,16 @@ import { pickup } from '../content/copy';
     justify-items: end;
     gap: 8px;
   }
-  .lines :global(.line__price) {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
+  .foot-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .foot-note :global(.wa-ask) {
+    flex: none;
   }
   .lines :global(.qty button) {
     width: 32px;
@@ -311,20 +318,6 @@ import { pickup } from '../content/copy';
     background: var(--paper);
     display: grid;
     gap: 8px;
-  }
-  .totals {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 1rem;
-  }
-  .totals strong {
-    font: 600 1.4rem/1 var(--serif);
-    font-variant-numeric: tabular-nums;
-  }
-  .tax-note {
-    font-size: 0.78rem;
-    color: var(--muted);
   }
   .paused {
     padding: 10px 12px;

@@ -11,13 +11,17 @@ export const site = {
   area: 'Bahria Town Phase 8',
   city: 'Rawalpindi',
   region: 'Punjab',
-  address: 'Bahria Town Phase 8, Rawalpindi', // TODO: exact shop address
+  address: 'Burjul Sadiq Plaza No. 01, Ground Floor, Shop #06, Abu Bakar Commercial, Phase 8, Bahria Town, Rawalpindi',
+  streetAddress: 'Burjul Sadiq Plaza No. 01, Ground Floor, Shop #06, Abu Bakar Commercial, Phase 8, Bahria Town',
   geo: { lat: 33.4939, lng: 73.1053 }, // TODO: exact map pin (approximate centre of Phase 8)
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Essence+Bahria+Town+Phase+8+Rawalpindi', // TODO: shop's Google Maps link
+  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Burjul+Sadiq+Plaza+Abu+Bakar+Commercial+Phase+8+Bahria+Town+Rawalpindi', // TODO: shop's Google Maps pin link
+  mapQuery: 'Abu Bakar Commercial, Phase 8, Bahria Town, Rawalpindi',
 
-  whatsapp: '', // TODO: shop WhatsApp, e.g. 03001234567
+  whatsapp: '03045631810', // Shop WhatsApp (+92 304 5631810). The POS (Settings › Online orders) can override it live.
   phone: '', // TODO
-  instagram: '', // TODO: handle without @
+  instagram: 'essence.cafe.pk',
+  instagramUrl: 'https://www.instagram.com/essence.cafe.pk/',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=61595488500877',
   hours: '', // TODO: e.g. Daily 12 pm – 12 am
   openingHours: [] as { days: string[]; opens: string; closes: string }[], // TODO: for Google, e.g. { days: ['Monday', …], opens: '12:00', closes: '23:59' }
 

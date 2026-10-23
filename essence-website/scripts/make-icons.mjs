@@ -46,7 +46,7 @@ const bg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org
   <text x="70" y="250" font-family="Playfair Display, Georgia, serif" font-size="96" fill="#f6efe2">Essence</text>
   <text x="74" y="306" font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="6" fill="#d9b77e">PATISSERIE · COFFEE · DESSERT</text>
   <text x="70" y="400" font-family="Playfair Display, Georgia, serif" font-style="italic" font-size="46" fill="#f6efe2">Beautifully indulgent.</text>
-  <text x="72" y="452" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#c9bba5">Belgian chocolate cakes · Bahria Town Phase 8</text>
+  <text x="72" y="452" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#c9bba5">Rich chocolate cakes · Bahria Town Phase 8</text>
 </svg>`);
 await sharp(bg)
   .composite([

@@ -3,31 +3,31 @@
 
 export const seo = {
   home: {
-    title: 'Essence | Belgian Chocolate Cakes & Desserts in Bahria Town Phase 8',
+    title: 'Essence | Rich Chocolate Cakes & Desserts in Bahria Town Phase 8',
     description:
-      'Belgian chocolate cakes, cheesecakes, tiramisu and freshly baked desserts at Essence, Bahria Town Phase 8, Rawalpindi. Order online and pick up in store.',
+      'Rich chocolate cakes, cheesecakes, tiramisu and freshly baked desserts at Essence, Bahria Town Phase 8, Rawalpindi. Order online and pick up in store.',
   },
   menu: {
     title: 'Dessert Menu | Cakes, Cheesecakes & Brownies | Essence Bahria Town',
     description:
-      'The full Essence dessert menu: Belgian chocolate cake, fudge brownies, blueberry and salted caramel cheesecake, tiramisu, tres leches and more. Order online for pickup in Bahria Town Phase 8.',
+      'The full Essence dessert menu: rich chocolate cake, fudge brownies, blueberry and salted caramel cheesecake, tiramisu, tres leches and more. Order online for pickup in Bahria Town Phase 8.',
   },
 };
 
 export const hero = {
-  eyebrow: 'Belgian chocolate · Bahria Town Phase 8',
+  eyebrow: 'Rich chocolate · Bahria Town Phase 8',
   title: ['Beautifully', 'indulgent.'],
   sub: 'Unforgettably delicious. Made for your sweetest moments.',
   script: 'Sweet moments, better here',
 };
 
-export const marquee = ['Belgian Chocolate', 'Freshly Baked', 'Handcrafted', 'Bahria Town Phase 8', 'Order for Pickup'];
+export const marquee = ['Rich Chocolate', 'Freshly Baked', 'Handcrafted', 'Bahria Town Phase 8', 'Order for Pickup'];
 
 export const story = {
-  kicker: 'The Belgian chocolate cake',
-  beats: ['Deep Belgian chocolate.', 'A texture that melts.', 'Made to be shared.'],
+  kicker: 'The rich chocolate cake',
+  beats: ['Deep, rich chocolate.', 'A texture that melts.', 'Made to be shared.'],
   body:
-    'Discover the irresistible richness of Belgian chocolate cakes, where deep chocolate flavours meet a delightful texture to create a truly indulgent treat.',
+    'Discover the irresistible indulgence of rich chocolate cakes, where deep chocolate flavours meet a delightful texture to create a truly indulgent treat.',
 };
 
 export const moments = {
@@ -49,7 +49,7 @@ export const pickup = {
     { title: 'Collect in store', text: 'Show your Order ID at the counter.' },
   ],
   banner: 'Pickup only. Collect your order at Essence, Bahria Town Phase 8, using your Order ID.',
-  tax: 'GST is applied at the counter based on your payment method.',
+  confirm: 'We’ll confirm your order on WhatsApp. Pay when you collect.',
 };
 
 export const visit = {
@@ -64,7 +64,7 @@ export const menuIntro = {
   title: 'The dessert menu',
   lead: 'Handcrafted, freshly baked, always delicious.',
   body: [
-    'From our signature Belgian chocolate cake and fudgy chocolate brownies to creamy cheesecakes, a classic Italian tiramisu and a soft tres leches, every Essence dessert is made to turn an ordinary day into a sweet moment.',
+    'From our signature rich chocolate cake and fudgy chocolate brownies to creamy cheesecakes, a classic Italian tiramisu and a soft tres leches, every Essence dessert is made to turn an ordinary day into a sweet moment.',
     'Order online and collect from our patisserie in Bahria Town Phase 8, Rawalpindi. Place your order with just your phone number, then pick it up with your Order ID. It’s ready when you are.',
   ],
 };
@@ -78,8 +78,8 @@ export const categoryLines: Record<string, string> = {
 /** Item pages: an extra paragraph for search and a short SEO description. Keyed by product id. */
 export const itemCopy: Record<string, { long: string; keywords: string }> = {
   'm-chocolate-cake': {
-    long: 'Our chocolate cake is where deep Belgian chocolate meets a moist, tender sponge, finished with a velvety chocolate frosting. Rich without being heavy, it is the cake for birthdays, celebrations and every moment in between. Order a slice or more online and pick it up from Essence in Bahria Town Phase 8.',
-    keywords: 'Belgian chocolate cake Bahria Town, chocolate cake Rawalpindi',
+    long: 'Our chocolate cake is where deep, rich chocolate meets a moist, tender sponge, finished with a velvety chocolate frosting. Rich without being heavy, it is the cake for birthdays, celebrations and every moment in between. Order a slice or more online and pick it up from Essence in Bahria Town Phase 8.',
+    keywords: 'rich chocolate cake Bahria Town, chocolate cake Rawalpindi',
   },
   'm-brownie': {
     long: 'Dense, fudgy and deeply chocolatey: our chocolate fudge brownie is made with rich chocolate, cocoa and butter, with just a hint of vanilla. Crisp on top and gooey in the middle, it is the brownie chocolate lovers come back for.',

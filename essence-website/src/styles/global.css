@@ -3,6 +3,7 @@
   --cream: #f9f5ec;
   --paper: #fffdf8;
   --beige: #ede3cf;
+  --beige-light: #f4ede1;
   --sand: #e2d8c3;
   --olive: #4e5726;
   --olive-deep: #343a17;
@@ -410,4 +411,85 @@ html.motion .leaf[data-draw].is-drawn path {
   color: var(--cocoa);
   font-weight: 600;
   font-size: 0.82rem;
+}
+
+/* ── WhatsApp enquiry buttons ── */
+.wa-ask {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: #1f8f4e;
+  background: #e3f3e8;
+  font: 600 0.85rem/1 var(--sans);
+  text-decoration: none;
+  transition: transform 0.35s var(--ease), background-color 0.3s, color 0.3s;
+}
+.wa-ask svg {
+  width: 19px;
+  height: 19px;
+  flex: none;
+}
+.wa-ask:hover {
+  transform: translateY(-2px);
+  background: #1f8f4e;
+  color: #fff;
+}
+.wa-ask--compact {
+  width: 40px;
+  padding: 0;
+}
+
+/* ── Textured light-beige backdrop (menu sections): warm glows, paper grain, faint leaf wallpaper ── */
+.textured {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(55% 45% at 0% 0%, rgb(201 147 102 / 20%), transparent 70%),
+    radial-gradient(45% 40% at 100% 35%, rgb(78 87 38 / 11%), transparent 70%),
+    radial-gradient(60% 50% at 30% 105%, rgb(201 147 102 / 16%), transparent 70%),
+    var(--beige-light);
+}
+.textured::before,
+.textured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+/* Paper grain. */
+.textured::before {
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .32 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Leaf wallpaper: little olive sprigs on a staggered grid. */
+.textured::after {
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%234e5726' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(28 30) rotate(-18)'%3E%3Cpath d='M20 34V10M20 20c-5 0-10-3-12-9 6 0 10 3 12 9ZM20 20c5 0 10-3 12-9-6 0-10 3-12 9ZM20 11c-2-3-2-6 0-8 2 2 2 5 0 8Z'/%3E%3C/g%3E%3Cg transform='translate(112 104) rotate(22)'%3E%3Cpath d='M20 34V10M20 20c-5 0-10-3-12-9 6 0 10 3 12 9ZM20 20c5 0 10-3 12-9-6 0-10 3-12 9ZM20 11c-2-3-2-6 0-8 2 2 2 5 0 8Z'/%3E%3C/g%3E%3Ccircle cx='132' cy='40' r='1.6' fill='%234e5726' stroke='none'/%3E%3Ccircle cx='48' cy='128' r='1.6' fill='%234e5726' stroke='none'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 50%, #000 30%, transparent 85%);
+  mask-image: radial-gradient(120% 90% at 50% 50%, #000 30%, transparent 85%);
+}
+.textured > .sprig {
+  position: absolute;
+  z-index: -1;
+  width: clamp(150px, 19vw, 280px);
+  color: var(--olive);
+  opacity: 0.42;
+  pointer-events: none;
+}
+.textured > .sprig--tl {
+  top: -14px;
+  left: -36px;
+  transform: rotate(-14deg);
+}
+.textured > .sprig--br {
+  right: -40px;
+  bottom: -30px;
+  transform: scale(-1, -1) rotate(-10deg);
 }

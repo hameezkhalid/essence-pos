@@ -4,8 +4,9 @@ import Base from '../../layouts/Base.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import Icon from '../../components/Icon.astro';
 import Leaf from '../../components/Leaf.astro';
+import WaAsk from '../../components/WaAsk.astro';
 import { site } from '../../site.config';
-import { type Product, categoryOf, fromPrice, hasOptions, menu, rs, slugOf } from '../../lib/menu';
+import { type Product, categoryOf, hasOptions, menu, slugOf } from '../../lib/menu';
 import { photoFor } from '../../lib/images';
 import { itemCopy, pickup } from '../../content/copy';
 
@@ -19,7 +20,7 @@ const cat = categoryOf(p);
 const photo = photoFor(p.id);
 const copy = itemCopy[p.id];
 const title = `${p.name} in Bahria Town Phase 8 | Essence`;
-const description = `${p.description} ${rs(p.price)} at Essence, Bahria Town Phase 8, Rawalpindi. Order online for pickup.`.slice(0, 160);
+const description = `${p.description} Freshly made at Essence, Bahria Town Phase 8, Rawalpindi. Order online for pickup.`.slice(0, 160);
 const related = [...menu.products.filter((x) => x.id !== p.id && x.categoryId === p.categoryId), ...menu.products.filter((x) => x.categoryId !== p.categoryId)].slice(0, 4);
 const url = `${site.url}/menu/${slug}`;
 
@@ -31,7 +32,6 @@ const schema = [
     description: copy?.long ?? p.description,
     url,
     ...(photo ? { image: new URL(photo.src, site.url).href } : {}),
-    offers: { '@type': 'Offer', price: (p.price / 100).toFixed(0), priceCurrency: 'PKR', availability: p.available ? 'https://schema.org/InStoreOnly' : 'https://schema.org/SoldOut' },
   },
   {
     '@type': 'BreadcrumbList',
@@ -73,10 +73,7 @@ const schema = [
         {cat && <p class="eyebrow">{cat.name}</p>}
         <h1 class="item__title">{p.name}</h1>
         <p class="item__desc">{p.description}</p>
-        <div class="item__price">
-          <span data-price>{rs(fromPrice(p))}</span>
-          <span class="chip chip--sold item__sold">Sold out today</span>
-        </div>
+        <span class="chip chip--sold item__sold">Sold out today</span>
         <div class="item__buy">
           {
             hasOptions(p) ? (
@@ -96,6 +93,7 @@ const schema = [
               </>
             )
           }
+          <WaAsk message={`I'd like to ask about the ${p.name}.`} class="item__wa" />
         </div>
         <p class="item__pickup"><Icon name="bag" /> {pickup.banner}</p>
         {copy && <p class="item__long">{copy.long}</p>}
@@ -174,14 +172,13 @@ const schema = [
     color: var(--muted);
     max-width: 40ch;
   }
-  .item__price {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font: 600 2rem/1 var(--serif);
-    font-variant-numeric: tabular-nums;
+  .item__buy :global(.item__wa) {
+    min-height: 52px;
+    padding: 0 20px;
+    font-size: 0.95rem;
   }
   .item__sold {
+    width: fit-content;
     display: none;
   }
   .item[data-sold] .item__sold {

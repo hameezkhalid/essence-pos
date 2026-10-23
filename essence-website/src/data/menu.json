@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-21T05:18:49.545Z",
+  "fetchedAt": "2026-10-23T15:03:06.501Z",
   "categories": [
     {
       "id": "cat-chocolate",
@@ -23,7 +23,7 @@
       "categoryId": "cat-chocolate",
       "name": "Chocolate Fudge Brownie",
       "description": "Rich chocolate, cocoa, butter, a hint of vanilla.",
-      "price": 45000,
+      "price": 55000,
       "sizes": [],
       "modifierGroupIds": [],
       "available": true,

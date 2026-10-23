@@ -35,9 +35,12 @@ const snap = (n) => shots && page.screenshot({ path: `${shots}/e2e_${n}.png` });
 
 await page.goto(`${site}/menu`, { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => document.querySelector('[data-product="m-banana-bread"]')?.hasAttribute('data-sold'), { timeout: 8000 }).catch(() => fail('sold-out flag not applied from live data'));
-const tiramisuPrice = await page.$eval('[data-product="m-tiramisu"] [data-price]', (e) => e.textContent);
-if (tiramisuPrice !== 'Rs 999') fail(`live price not applied (got ${tiramisuPrice})`);
-console.log('✔ live prices + sold out applied');
+console.log('✔ sold out applied from live data');
+const visiblePrices = await page.evaluate(() => /Rs\s?\d/.test(document.body.innerText));
+if (visiblePrices) fail('a price is visible on the page');
+const ask = await page.$eval('[data-product="m-tiramisu"] [data-wa]', (a) => ({ hidden: a.hidden, href: a.href }));
+if (ask.hidden || !ask.href.startsWith('https://wa.me/923001234567?text=') || !decodeURIComponent(ask.href).includes('Tiramisu')) fail(`WhatsApp ask link wrong: ${JSON.stringify(ask)}`);
+console.log('✔ no prices shown; WhatsApp enquiry:', decodeURIComponent(ask.href));
 
 await page.$eval('[data-add="m-chocolate-cake"]', (b) => b.click());
 await page.$eval('[data-add="m-chocolate-cake"]', (b) => b.click());
@@ -51,9 +54,8 @@ await page.click('[data-open-cart]');
 await page.waitForFunction(() => document.querySelector('[data-next]')?.textContent?.includes('Continue') && !document.querySelector('[data-next]').disabled, { timeout: 8000 }).catch(() => fail('checkout button never enabled'));
 await new Promise((r) => setTimeout(r, 700));
 await snap('1_cart');
-const subtotal = await page.$eval('[data-subtotal]', (e) => e.textContent);
-if (subtotal !== 'Rs 1,750') fail(`subtotal ${subtotal}`);
-console.log('✔ cart drawer: subtotal', subtotal, '+ pickup banner');
+if (await page.evaluate(() => /Rs\s?\d/.test(document.querySelector('[data-cart]').innerText))) fail('price visible in cart');
+console.log('✔ cart drawer: no prices, pickup banner');
 
 await page.click('[data-next]');
 await new Promise((r) => setTimeout(r, 600));
@@ -71,7 +73,7 @@ await page.waitForSelector('[data-view="done"]:not([hidden])', { timeout: 15000 
 await new Promise((r) => setTimeout(r, 1500));
 await snap('3_done');
 const code = (await page.$eval('[data-done-code]', (e) => e.textContent)).replace('#', '');
-const wa = await page.$eval('[data-done-wa]', (e) => e.href);
+const wa = await page.$eval('[data-done-wa]', (e) => (e.hidden ? fail('order WhatsApp button hidden') : decodeURIComponent(e.href)));
 console.log('✔ order placed, code', code, 'wa link', wa);
 
 const doc = await (await fetch(`${EMU}/webOrders/${code}`, { headers: admin })).json();

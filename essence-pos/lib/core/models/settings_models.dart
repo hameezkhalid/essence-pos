@@ -324,8 +324,7 @@ class OnlineOrderSettings {
 
   static const placeholders = '{name} {code} {items} {subtotal} {store}';
 
-  static const defaultPlaced = 'Hi {name}! Your {store} order #{code} has been placed.\n\n{items}\nSubtotal: {subtotal} '
-      '(GST is added at the counter based on your payment method).\n\n'
+  static const defaultPlaced = 'Hi {name}! Your {store} order #{code} has been placed.\n\n{items}\n\n'
       'Please visit us at {store}, Bahria Town Phase 8 to collect your order. Just show your Order ID #{code}.';
   static const defaultReady = 'Hi {name}, your {store} order #{code} is ready for pickup. See you soon!';
   static const defaultCancelled = 'Hi {name}, sorry, we couldn\'t take your {store} order #{code}. '

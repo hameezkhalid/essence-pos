@@ -22,7 +22,6 @@ const schema = [
         name: p.name,
         description: p.description,
         url: `${site.url}/menu/${slugOf(p.id)}`,
-        offers: { '@type': 'Offer', price: (p.price / 100).toFixed(0), priceCurrency: 'PKR', availability: 'https://schema.org/InStoreOnly' },
       })),
     })),
   },
@@ -53,8 +52,12 @@ const schema = [
     </div>
   </section>
 
-  <div class="wrap menu-body">
-    <MenuGrid mode="sections" />
+  <div class="menu-body-bg textured">
+    <Leaf draw class="sprig sprig--tl" />
+    <Leaf draw class="sprig sprig--br" />
+    <div class="wrap">
+      <MenuGrid mode="sections" />
+    </div>
   </div>
 
   <section class="section menu-more">
@@ -122,11 +125,11 @@ const schema = [
     color: var(--cream);
     box-shadow: none;
   }
-  .menu-body {
-    padding-bottom: clamp(40px, 6vw, 80px);
+  .menu-body-bg {
+    padding-block: clamp(64px, 8vw, 110px);
   }
   .menu-more {
-    background: var(--beige);
+    background: var(--cream);
   }
   .menu-more__grid {
     display: grid;
@@ -144,7 +147,7 @@ const schema = [
   }
   details {
     border-radius: 18px;
-    background: var(--paper);
+    background: var(--beige-light);
     padding: 4px 22px;
   }
   summary {

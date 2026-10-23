@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
+import Social from './Social.astro';
 
 interface Props { dark?: boolean }
 const { dark = false } = Astro.props;
@@ -39,7 +40,10 @@ const links = [
   <nav aria-label="Mobile">
     {links.map((l, i) => <a href={l.href} style={`--i:${i}`}>{l.label}</a>)}
   </nav>
-  <p class="script mobile-menu__script">Sweet moments, better here</p>
+  <div>
+    <p class="script mobile-menu__script">Sweet moments, better here</p>
+    <Social labels class="mobile-menu__social" />
+  </div>
 </div>
 
 <style>
@@ -238,6 +242,11 @@ const links = [
   .mobile-menu__script {
     font-size: 2.2rem;
     color: var(--gold);
+    margin-bottom: 18px;
+  }
+  .mobile-menu :global(.mobile-menu__social) {
+    color: var(--gold);
+    --social-hover: var(--cocoa);
   }
   :global(body.menu-open) .nav {
     color: var(--on-dark);

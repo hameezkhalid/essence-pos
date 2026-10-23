@@ -122,7 +122,7 @@ function apply(live: Live) {
     reason: !s?.accepting ? 'paused' : away ? 'away' : undefined,
     whatsapp: s?.whatsapp || site.whatsapp,
     hours: s?.hours || site.hours,
-    address: s?.address || site.address,
+    address: site.address || s?.address || '',
   };
   emit();
 }

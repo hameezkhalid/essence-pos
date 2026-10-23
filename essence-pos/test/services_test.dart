@@ -330,6 +330,7 @@ void main() {
     expect(msg, startsWith('Hi Ali!'));
     expect(msg, contains('#ABCDE'));
     expect(msg, contains('1× '));
+    expect(msg, isNot(contains('Rs ')), reason: 'no prices in customer messages, matching the website');
     expect(whatsAppUri('03001234567', 'Hi').toString(), 'https://wa.me/923001234567?text=Hi');
   });
 

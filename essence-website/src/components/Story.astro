@@ -8,12 +8,12 @@ const cake = photoFor('m-chocolate-cake');
 
 <section class="story" id="story" data-story>
   <div class="story__sticky">
-    <p class="story__bg" aria-hidden="true" data-story-bg>Belgian chocolate</p>
+    <p class="story__bg" aria-hidden="true" data-story-bg>Rich chocolate</p>
     <div class="wrap story__grid">
       <div class="story__media">
         <div class="story__ring" aria-hidden="true"></div>
         <div class="arch story__img" data-story-img>
-          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="Slice of Belgian chocolate cake" loading="lazy" />}
+          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="Slice of rich chocolate cake" loading="lazy" />}
         </div>
         <Leaf draw class="story__leaf" />
       </div>

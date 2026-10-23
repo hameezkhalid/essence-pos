@@ -1,5 +1,5 @@
 // Cart drawer, product options sheet, add-to-cart buttons, checkout and the live menu on the page.
-import { rs } from '../lib/menu';
+import { waLink } from '../lib/menu';
 import * as store from '../lib/store';
 import { OrderError, placeOrder, shopWhatsApp } from '../lib/order';
 
@@ -25,7 +25,6 @@ export function initCart() {
 
   const linesEl = $('[data-lines]', dialog);
   const emptyEl = $('[data-empty]', dialog);
-  const subtotalEl = $('[data-subtotal]', dialog);
   const pausedEl = $('[data-paused]', dialog);
   const nextBtn = $<HTMLButtonElement>('[data-next]', dialog);
   const backBtn = $<HTMLButtonElement>('[data-cart-back]', dialog);
@@ -90,13 +89,11 @@ export function initCart() {
             p.available ? '' : '<div class="line__meta" style="color:var(--danger)">Sold out today</div>'
           }</div>
           <div class="line__right">
-            <span class="line__price">${rs(store.unitPrice(l) * l.qty)}</span>
             <div class="qty"><button type="button" data-line-step="-1" aria-label="One less ${esc(p.name)}">−</button><output>${l.qty}</output><button type="button" data-line-step="1" aria-label="One more ${esc(p.name)}">+</button></div>
           </div>
         </li>`;
       })
       .join('');
-    subtotalEl.textContent = rs(store.subtotal());
 
     const s = store.status;
     const soldOut = lines.some((l) => !store.products.get(l.productId)?.available);
@@ -110,9 +107,9 @@ export function initCart() {
         pausedEl.textContent = 'Something in your order just sold out. Remove it to continue.';
       }
     } else if (view === 'checkout') {
-      nextBtn.textContent = busy ? 'Placing your order…' : `Place pickup order · ${rs(store.subtotal())}`;
+      nextBtn.textContent = busy ? 'Placing your order…' : 'Place pickup order';
       nextBtn.disabled = busy || !lines.length || !s.open;
-      summaryEl.innerHTML = lines.map((l) => `<li><span>${l.qty}× ${esc(store.products.get(l.productId)!.name)}</span><span>${rs(store.unitPrice(l) * l.qty)}</span></li>`).join('');
+      summaryEl.innerHTML = lines.map((l) => `<li><span>${l.qty}× ${esc(store.products.get(l.productId)!.name)}</span><span>${esc(store.describe(l))}</span></li>`).join('');
     }
     if (view === 'checkout' && !lines.length) setView('cart');
   };
@@ -222,13 +219,13 @@ export function initCart() {
     $('[data-sheet-groups]', sheet).innerHTML = [
       p.sizes.length > 1
         ? `<fieldset><legend>Size</legend>${p.sizes
-            .map((s) => `<label><input type="radio" name="size" value="${s.code}" ${s === defSize ? 'checked' : ''}><span>${esc(s.label)}${s.delta ? ` ${s.delta > 0 ? '+' : '−'}${rs(Math.abs(s.delta))}` : ''}</span></label>`)
+            .map((s) => `<label><input type="radio" name="size" value="${s.code}" ${s === defSize ? 'checked' : ''}><span>${esc(s.label)}</span></label>`)
             .join('')}</fieldset>`
         : '',
       ...groups.map(
         (g) =>
           `<fieldset data-group="${g.id}" data-min="${g.minSelect}" data-max="${g.maxSelect}"><legend>${esc(g.name)}${g.minSelect ? '' : ' <small>(optional)</small>'}</legend>${g.options
-            .map((o) => `<label><input type="${g.maxSelect === 1 ? 'radio' : 'checkbox'}" name="g-${g.id}" value="${o.id}"><span>${esc(o.name)}${o.delta ? ` +${rs(o.delta)}` : ''}</span></label>`)
+            .map((o) => `<label><input type="${g.maxSelect === 1 ? 'radio' : 'checkbox'}" name="g-${g.id}" value="${o.id}"><span>${esc(o.name)}</span></label>`)
             .join('')}</fieldset>`,
       ),
     ].join('');
@@ -250,7 +247,6 @@ export function initCart() {
         boxes.forEach((b) => (b.disabled = !b.checked && n >= max));
       });
       const r = read();
-      $('[data-sheet-price]', sheet).textContent = rs(store.unitPrice({ productId: id, ...r }) * r.qty);
       const missing = groups.some((g) => g.minSelect > 0 && !r.optionIds.some((o) => g.options.some((x) => x.id === o)));
       $<HTMLButtonElement>('[data-sheet-add]', sheet).disabled = missing;
     };
@@ -276,9 +272,6 @@ export function initCart() {
       const p = store.products.get(el.dataset.product!);
       if (!p) continue;
       el.toggleAttribute('data-sold', !p.available);
-      const price = el.querySelector('[data-price]');
-      const min = p.price + (p.sizes.length ? Math.min(...p.sizes.map((s) => s.delta)) : 0);
-      if (price) price.textContent = rs(min);
       el.querySelectorAll<HTMLButtonElement>(`[data-add="${p.id}"]`).forEach((b) => (b.disabled = !p.available));
     }
     const s = store.status;
@@ -291,6 +284,12 @@ export function initCart() {
     $$('[data-live-row]').forEach((e) => (e.hidden = !(s as any)[e.dataset.liveRow!]));
     $$<HTMLAnchorElement>('[data-live="whatsapp-link"]').forEach((a) => {
       const link = shopWhatsApp(s.whatsapp, 'Hi Essence!');
+      a.hidden = !link;
+      if (link) a.href = link;
+    });
+    // "Ask on WhatsApp" buttons (items, cart): the shop's number comes live from the POS.
+    $$<HTMLAnchorElement>('[data-wa]').forEach((a) => {
+      const link = waLink(s.whatsapp, a.dataset.wa!);
       a.hidden = !link;
       if (link) a.href = link;
     });

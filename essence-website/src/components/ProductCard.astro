@@ -1,14 +1,14 @@
 ---
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
-import { type Product, fromPrice, hasOptions, rs, slugOf } from '../lib/menu';
+import WaAsk from './WaAsk.astro';
+import { type Product, hasOptions, slugOf } from '../lib/menu';
 import { photoFor } from '../lib/images';
 
 interface Props { product: Product; eager?: boolean; index?: number }
 const { product: p, eager = false, index = 0 } = Astro.props;
 const photo = photoFor(p.id);
 const slug = slugOf(p.id);
-const from = p.sizes.length > 1;
 ---
 
 <article class="card" data-product={p.id} data-sold={!p.available ? '' : undefined} style={`--i:${index % 4}`}>
@@ -34,7 +34,7 @@ const from = p.sizes.length > 1;
     <h3><a href={`/menu/${slug}`}>{p.name}</a></h3>
     <p class="card__desc">{p.description}</p>
     <div class="card__row">
-      <span class="card__price">{from && <small>from </small>}<span data-price>{rs(fromPrice(p))}</span></span>
+      <WaAsk compact message={`I'd like to ask about the ${p.name}.`} label={`Ask about ${p.name} on WhatsApp`} />
       <button class="add" type="button" data-add={p.id} data-options={hasOptions(p) ? '' : undefined} aria-label={`Add ${p.name} to cart`} disabled={!p.available}>
         <Icon name="plus" />
         <span>Add</span>
@@ -109,16 +109,8 @@ const from = p.sizes.length > 1;
   .card__row {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     margin-top: 6px;
-  }
-  .card__price {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-  }
-  .card__price small {
-    font-weight: 400;
-    color: var(--muted);
   }
   .add {
     display: inline-flex;
