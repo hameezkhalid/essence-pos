@@ -2,7 +2,7 @@
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
-import { photoFor } from '../lib/images';
+import { imageFor } from '../lib/images';
 import { gatherings } from '../content/copy';
 ---
 
@@ -17,11 +17,11 @@ import { gatherings } from '../content/copy';
     <div class="moments__grid">
       {
         gatherings.tiles.map((t, i) => {
-          const photo = photoFor(t.product);
+          const photo = imageFor(t.image);
           return (
             <a class="tile" href="/corporate-events" data-tilt data-reveal style={`--i:${i}`}>
               <div class="tile__media arch">
-                {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360]} sizes="(max-width: 760px) 80vw, 360px" alt="" loading="lazy" />}
+                {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360, 540, 720]} sizes="(max-width: 760px) 80vw, 360px" quality="high" alt={t.alt} loading="lazy" />}
               </div>
               <p class="script tile__label">{t.label}</p>
               <p class="tile__line">{t.line}</p>

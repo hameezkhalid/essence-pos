@@ -1,9 +1,9 @@
 ---
 import { Picture } from 'astro:assets';
 import Leaf from './Leaf.astro';
-import { photoFor } from '../lib/images';
+import { homePhoto } from '../lib/images';
 import { intro } from '../content/copy';
-const cake = photoFor('m-chocolate-cake');
+const cake = homePhoto('welcome');
 ---
 
 <section class="story" id="story" data-story>
@@ -13,7 +13,7 @@ const cake = photoFor('m-chocolate-cake');
       <div class="story__media">
         <div class="story__ring" aria-hidden="true"></div>
         <div class="arch story__img" data-story-img>
-          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="ESSENCE chocolate cake" loading="lazy" />}
+          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360, 540, 720]} sizes="(max-width: 860px) 70vw, 360px" quality="high" alt="ESSENCE lemon tart and blueberry cheesecake" loading="lazy" />}
         </div>
         <Leaf draw class="story__leaf" />
       </div>

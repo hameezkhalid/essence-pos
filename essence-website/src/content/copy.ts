@@ -78,9 +78,9 @@ export const gatherings = {
   body: 'Planning a team meeting, celebration or special event? Get in touch with ESSENCE to discuss dessert boxes, cakes and tailored food-and-drink enquiries for your occasion.',
   button: 'Corporate & Events Enquiries',
   tiles: [
-    { label: 'Team meetings', line: 'A sweeter break for your team.', product: 'm-brownie' },
-    { label: 'Celebrations', line: 'Cakes for special moments.', product: 'm-chocolate-cake' },
-    { label: 'Client gifts', line: 'Dessert boxes to say thank you.', product: 'm-og-cookies' },
+    { label: 'Team meetings', line: 'A sweeter break for your team.', image: 'pickup-2', alt: 'ESSENCE dessert boxes and coffee' },
+    { label: 'Celebrations', line: 'Cakes for special moments.', image: 'm-chocolate-cake', alt: 'ESSENCE chocolate cake' },
+    { label: 'Client gifts', line: 'Dessert boxes to say thank you.', image: 'corporate', alt: 'ESSENCE gift boxes for corporate orders' },
   ],
 };
 
@@ -175,7 +175,8 @@ export const corporate = {
       title: 'A Sweeter Break for Your Team',
       body: 'Planning a meeting, staff celebration or client gathering? Enquire about brownies, cookies, cakes and dessert selections for your workplace. Share your requirements and preferred date so we can discuss availability and a suitable order.',
       bullets: ['Office meetings', 'Staff celebrations', 'Client gifts', 'Bulk dessert enquiries'],
-      product: 'm-brownie',
+      image: 'pickup-2',
+      alt: 'ESSENCE dessert boxes and coffee for the office',
     },
     {
       id: 'celebrations',
@@ -183,7 +184,8 @@ export const corporate = {
       title: 'Sweet Details for Special Moments',
       body: 'Make birthdays, anniversaries, family gatherings and other celebrations feel extra special with cakes and dessert selections from ESSENCE. Contact us to discuss the occasion, guest count, preferred items and any custom requests.',
       bullets: ['Birthday and anniversary orders', 'Dessert boxes and platters', 'Cakes for celebrations', 'Custom dessert enquiries'],
-      product: 'm-chocolate-cake',
+      image: 'hero-2',
+      alt: 'ESSENCE chocolate cake for celebrations',
     },
     {
       id: 'catering',
@@ -191,7 +193,8 @@ export const corporate = {
       title: 'Desserts and Coffee for Your Gathering',
       body: 'Looking for dessert or coffee options for a meeting or event? Send us your event details and we will confirm which items, quantities and service options may be available for your date.',
       bullets: ['Dessert selections', 'Coffee enquiries', 'Quantities for your guest count', 'Availability confirmed for your date'],
-      product: 'm-tiramisu',
+      image: 'pickup-1',
+      alt: 'ESSENCE desserts and coffee packed for a gathering',
     },
   ],
   form: {

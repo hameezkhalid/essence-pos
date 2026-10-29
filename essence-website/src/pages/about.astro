@@ -4,10 +4,10 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Leaf from '../components/Leaf.astro';
 import { site } from '../site.config';
-import { photoFor } from '../lib/images';
+import { homePhoto } from '../lib/images';
 import { about, seo } from '../content/copy';
 
-const art = [photoFor('m-tres-leches'), photoFor('m-salted-caramel-cheesecake')];
+const art = [homePhoto('welcome'), homePhoto('hero-2')];
 const schema = [
   { '@type': 'AboutPage', name: about.title, url: `${site.url}/about`, about: { '@id': `${site.url}/#business` } },
   {
@@ -40,7 +40,7 @@ const schema = [
               photo && (
                 <div class={`about__img about__img--${i}`}>
                   <div class="arch">
-                    <Picture src={photo} formats={['avif', 'webp']} widths={[280, 360]} sizes="(max-width: 860px) 46vw, 300px" alt="" loading="eager" />
+                    <Picture src={photo} formats={['avif', 'webp']} widths={[300, 450, 640]} sizes="(max-width: 860px) 46vw, 300px" quality="high" alt="" loading="eager" />
                   </div>
                 </div>
               ),

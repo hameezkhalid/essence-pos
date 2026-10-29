@@ -55,9 +55,10 @@ const schema = [
               <Picture
                 src={photo}
                 formats={['avif', 'webp']}
-                widths={[360]}
+                widths={[420, 560, 800]}
                 sizes="(max-width: 860px) 80vw, 420px"
                 alt={`ESSENCE ${p.name.toLowerCase()}`}
+                quality="high"
                 loading="eager"
                 fetchpriority="high"
                 style={`view-transition-name: p-${slug}`}

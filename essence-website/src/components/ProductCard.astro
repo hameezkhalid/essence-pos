@@ -18,9 +18,10 @@ const slug = slugOf(p.id);
         <Picture
           src={photo}
           formats={['avif', 'webp']}
-          widths={[180, 360]}
-          sizes="(max-width: 600px) 46vw, 300px"
-          alt=""
+          widths={[280, 420, 560]}
+          sizes="(max-width: 600px) 46vw, 266px"
+          quality="high"
+          alt={`ESSENCE ${p.name.toLowerCase()}`}
           loading={eager ? 'eager' : 'lazy'}
           style={`view-transition-name: p-${slug}`}
         />

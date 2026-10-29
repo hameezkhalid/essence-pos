@@ -17,7 +17,7 @@ export const site = {
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Burjul+Sadiq+Plaza+Abu+Bakar+Commercial+Phase+8+Bahria+Town+Rawalpindi', // TODO: shop's Google Maps pin link
   mapQuery: 'Abu Bakar Commercial, Phase 8, Bahria Town, Rawalpindi',
 
-  whatsapp: '03045631810', // Shop WhatsApp (+92 304 5631810). The POS (Settings › Online orders) can override it live.
+  whatsapp: '03325866883', // Shop WhatsApp (+92 332 5866883). The POS (Settings › Online orders) can override it live.
   phone: '', // TODO
   instagram: 'essence.cafe.pk',
   instagramUrl: 'https://www.instagram.com/essence.cafe.pk/',

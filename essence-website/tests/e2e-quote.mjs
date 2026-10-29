@@ -42,7 +42,7 @@ if (shots) await page.screenshot({ path: `${shots}/quote_filled.png`, fullPage: 
 await page.$eval('[data-quote] button[type=submit]', (b) => b.click());
 await page.waitForSelector('[data-quote-done]:not([hidden])', { timeout: 4000 }).catch(() => fail('no success after opening WhatsApp'));
 const opened = await page.evaluate(() => window.__opened.map(decodeURIComponent));
-if (opened.length !== 1 || !opened[0].startsWith('https://wa.me/923045631810?text=Hello ESSENCE')) fail(`opened: ${opened}`);
+if (opened.length !== 1 || !opened[0].startsWith('https://wa.me/923325866883?text=Hello ESSENCE')) fail(`opened: ${opened}`);
 for (const want of ['Name: Sara Ahmed', 'Company: Acme Pvt Ltd', 'Phone/WhatsApp: 0321 5550000', 'Event type: Corporate order', 'Date: Thu, 12 November 2026', 'Approximate guests/quantity: 40', 'Location: Bahria Town Phase 7', 'Items/services required: Brownies and cookies', 'Details: Afternoon team meeting', 'Please let me know availability and the next steps.']) {
   if (!opened[0].includes(want)) fail(`message missing "${want}":\n${opened[0]}`);
 }

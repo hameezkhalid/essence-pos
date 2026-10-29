@@ -4,12 +4,12 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Leaf from '../components/Leaf.astro';
 import { site } from '../site.config';
-import { photoFor } from '../lib/images';
+import { homePhoto, imageFor, photoFor } from '../lib/images';
 import { waLink } from '../lib/wa';
 import { corporate, seo } from '../content/copy';
 
 const wa = waLink(site.whatsapp, corporate.whatsapp, '');
-const art = [photoFor('m-og-cookies'), photoFor('m-chocolate-cake'), photoFor('m-brownie')];
+const art = [photoFor('m-og-cookies'), homePhoto('corporate'), homePhoto('hero-1')];
 const schema = [
   {
     '@type': 'BreadcrumbList',
@@ -43,7 +43,7 @@ const schema = [
               photo && (
                 <div class={`ce-hero__img ce-hero__img--${i}`} data-depth={[30, 14, 24][i]}>
                   <div class="arch">
-                    <Picture src={photo} formats={['avif', 'webp']} widths={[240, 360]} sizes="(max-width: 860px) 40vw, 260px" alt="" loading="eager" />
+                    <Picture src={photo} formats={['avif', 'webp']} widths={[260, 400, 600]} sizes="(max-width: 860px) 44vw, 300px" quality="high" alt="" loading="eager" />
                   </div>
                 </div>
               ),
@@ -56,14 +56,14 @@ const schema = [
   <div class="ce-sections">
     {
       corporate.sections.map((sec, i) => {
-        const photo = photoFor(sec.product);
+        const photo = imageFor(sec.image);
         return (
           <section class:list={['ce-row', { 'ce-row--flip': i % 2 === 1 }]} id={sec.id} aria-labelledby={`h-${sec.id}`}>
             <div class="wrap ce-row__grid">
               <div class="ce-row__media" data-reveal="scale">
                 <span class="ce-row__n" aria-hidden="true">0{i + 1}</span>
                 <div class="arch">
-                  {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360]} sizes="(max-width: 860px) 70vw, 340px" alt="" loading="lazy" />}
+                  {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[340, 520, 700]} sizes="(max-width: 860px) 72vw, 340px" quality="high" alt={sec.alt} loading="lazy" />}
                 </div>
               </div>
               <div class="ce-row__copy">

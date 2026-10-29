@@ -5,7 +5,7 @@ import { writeFile } from 'node:fs/promises';
 
 const out = (f) => new URL(`../public/${f}`, import.meta.url).pathname;
 const logo = new URL('../src/assets/logo.png', import.meta.url).pathname;
-const photo = (id) => new URL(`../src/assets/menu/${id}.jpg`, import.meta.url).pathname;
+const photo = (name) => new URL(`../src/assets/home/${name}.jpg`, import.meta.url).pathname;
 
 // The badge logo on a cream disc (it already has a transparent corner area).
 const icon = (size) => sharp(logo).resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
@@ -50,9 +50,9 @@ const bg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org
 </svg>`);
 await sharp(bg)
   .composite([
-    { input: await arch('m-brownie', 200, 260), left: 650, top: 300 },
-    { input: await arch('m-chocolate-cake', 260, 340), left: 790, top: 120 },
-    { input: await arch('m-tiramisu', 190, 250), left: 990, top: 290 },
+    { input: await arch('hero-2', 200, 260), left: 650, top: 300 },
+    { input: await arch('hero-1', 260, 340), left: 790, top: 120 },
+    { input: await arch('hero-3', 190, 250), left: 990, top: 290 },
   ])
   .jpeg({ quality: 86, mozjpeg: true })
   .toFile(out('og-image.jpg'));

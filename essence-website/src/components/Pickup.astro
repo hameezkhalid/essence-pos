@@ -1,6 +1,10 @@
 ---
+import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
+import { homePhoto } from '../lib/images';
 import { pickup } from '../content/copy';
+
+const photo = homePhoto('pickup-1');
 ---
 
 <section class="pickup-sec section grain" id="pickup">
@@ -9,6 +13,21 @@ import { pickup } from '../content/copy';
       <p class="eyebrow" data-reveal>How pickup works</p>
       <h2 class="h2" data-reveal>{pickup.title}</h2>
     </header>
+    {
+      photo && (
+        <figure class="pickup-sec__photo" data-reveal="scale">
+          <Picture
+            src={photo}
+            formats={['avif', 'webp']}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(max-width: 1240px) calc(100vw - 2 * var(--gutter)), 1144px"
+            quality="high"
+            alt="ESSENCE pickup order: dessert boxes, coffee and a takeaway bag"
+            loading="lazy"
+          />
+        </figure>
+      )
+    }
     <ol class="steps" data-steps>
       <svg class="steps__line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0 20 C160 0 330 40 500 20 S840 0 1000 20" pathLength="1" data-steps-line></path>
@@ -42,6 +61,18 @@ import { pickup } from '../content/copy';
   .pickup-sec__head {
     text-align: center;
     justify-items: center;
+  }
+  .pickup-sec__photo {
+    margin: 0 0 clamp(56px, 7vw, 90px);
+    aspect-ratio: 16 / 7;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 60%), 0 0 0 1px rgb(217 183 126 / 25%);
+  }
+  .pickup-sec__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .steps {
     position: relative;
@@ -116,6 +147,10 @@ import { pickup } from '../content/copy';
     color: var(--gold);
   }
   @media (max-width: 760px) {
+    .pickup-sec__photo {
+      aspect-ratio: 4 / 3;
+      border-radius: 22px;
+    }
     .steps {
       grid-template-columns: 1fr;
       gap: 44px;

@@ -2,12 +2,12 @@
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
-import { photoFor } from '../lib/images';
+import { homePhoto } from '../lib/images';
 import { hero } from '../content/copy';
 
-const main = photoFor('m-chocolate-cake');
-const left = photoFor('m-brownie');
-const right = photoFor('m-tiramisu');
+const main = homePhoto('hero-1');
+const left = homePhoto('hero-2');
+const right = homePhoto('hero-3');
 const ring = 'Patisserie · Coffee · Dessert · ';
 ---
 
@@ -44,7 +44,7 @@ const ring = 'Patisserie · Coffee · Dessert · ';
         left && (
           <div class="hero__img hero__img--a" data-depth="28">
             <div class="arch">
-              <Picture src={left} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 32vw, 200px" alt="ESSENCE chocolate fudge brownie" loading="eager" />
+              <Picture src={left} formats={['avif', 'webp']} widths={[220, 340, 460]} sizes="(max-width: 860px) 34vw, 210px" quality="high" alt="ESSENCE chocolate cake" loading="eager" />
             </div>
           </div>
         )
@@ -56,9 +56,10 @@ const ring = 'Patisserie · Coffee · Dessert · ';
               <Picture
                 src={main}
                 formats={['avif', 'webp']}
-                widths={[280, 360]}
-                sizes="(max-width: 860px) 52vw, 340px"
-                alt="ESSENCE chocolate cake"
+                widths={[340, 520, 720]}
+                sizes="(max-width: 860px) 56vw, 340px"
+                alt="ESSENCE chocolate fudge brownies"
+                quality="high"
                 loading="eager"
                 fetchpriority="high"
               />
@@ -70,7 +71,7 @@ const ring = 'Patisserie · Coffee · Dessert · ';
         right && (
           <div class="hero__img hero__img--b" data-depth="36">
             <div class="arch">
-              <Picture src={right} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 30vw, 190px" alt="ESSENCE tiramisu" loading="eager" />
+              <Picture src={right} formats={['avif', 'webp']} widths={[220, 340, 460]} sizes="(max-width: 860px) 32vw, 200px" quality="high" alt="ESSENCE tiramisu" loading="eager" />
             </div>
           </div>
         )
