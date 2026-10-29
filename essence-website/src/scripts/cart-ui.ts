@@ -1,5 +1,5 @@
 // Cart drawer, product options sheet, add-to-cart buttons, checkout and the live menu on the page.
-import { waLink } from '../lib/menu';
+import { waLink } from '../lib/wa';
 import * as store from '../lib/store';
 import { OrderError, placeOrder, shopWhatsApp } from '../lib/order';
 
@@ -60,6 +60,15 @@ export function initCart() {
     if (t === dialog || t.closest('[data-close-cart]')) close();
   });
   $$('[data-open-cart]').forEach((b) => b.addEventListener('click', open));
+  // "Order Now": straight to the cart when it has something in it, otherwise on to the menu.
+  $$<HTMLAnchorElement>('[data-order-now]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      if (store.count() > 0) {
+        e.preventDefault();
+        open();
+      }
+    }),
+  );
   backBtn.addEventListener('click', () => setView('cart'));
 
   const setView = (v: View) => {
@@ -86,7 +95,7 @@ export function initCart() {
         return `<li data-key="${l.key}">
           ${p.thumb ? `<img class="line__img" src="${p.thumb}" alt="" width="64" height="72" loading="lazy">` : '<span class="line__img"></span>'}
           <div><a class="line__name" href="${p.url}">${esc(p.name)}</a>${meta ? `<div class="line__meta">${esc(meta)}</div>` : ''}${
-            p.available ? '' : '<div class="line__meta" style="color:var(--danger)">Sold out today</div>'
+            p.available ? '' : '<div class="line__meta" style="color:var(--danger)">Currently unavailable</div>'
           }</div>
           <div class="line__right">
             <div class="qty"><button type="button" data-line-step="-1" aria-label="One less ${esc(p.name)}">−</button><output>${l.qty}</output><button type="button" data-line-step="1" aria-label="One more ${esc(p.name)}">+</button></div>
@@ -104,7 +113,7 @@ export function initCart() {
       nextBtn.disabled = !lines.length || !s.open || soldOut;
       if (soldOut && s.open) {
         pausedEl.hidden = false;
-        pausedEl.textContent = 'Something in your order just sold out. Remove it to continue.';
+        pausedEl.textContent = 'Something in your order is currently unavailable. Remove it to continue.';
       }
     } else if (view === 'checkout') {
       nextBtn.textContent = busy ? 'Placing your order…' : 'Place pickup order';
@@ -162,7 +171,7 @@ export function initCart() {
     $('[data-done-code]', dialog).textContent = `#${code}`;
     $('[data-done-phone]', dialog).textContent = phone;
     const wa = $<HTMLAnchorElement>('[data-done-wa]', dialog);
-    const link = shopWhatsApp(store.status.whatsapp, `Hi Essence! I just placed pickup order #${code}${name ? ` (${name})` : ''}.`);
+    const link = shopWhatsApp(store.status.whatsapp, `Hi ESSENCE! I just placed pickup order #${code}${name ? ` (${name})` : ''}.`);
     wa.hidden = !link;
     wa.href = link || '#';
     setView('done');
@@ -283,13 +292,18 @@ export function initCart() {
     $$('[data-live="whatsapp"]').forEach((e) => (e.textContent = s.whatsapp));
     $$('[data-live-row]').forEach((e) => (e.hidden = !(s as any)[e.dataset.liveRow!]));
     $$<HTMLAnchorElement>('[data-live="whatsapp-link"]').forEach((a) => {
-      const link = shopWhatsApp(s.whatsapp, 'Hi Essence!');
+      const link = shopWhatsApp(s.whatsapp, 'Hi ESSENCE!');
       a.hidden = !link;
       if (link) a.href = link;
     });
     // "Ask on WhatsApp" buttons (items, cart): the shop's number comes live from the POS.
     $$<HTMLAnchorElement>('[data-wa]').forEach((a) => {
       const link = waLink(s.whatsapp, a.dataset.wa!);
+      a.hidden = !link;
+      if (link) a.href = link;
+    });
+    $$<HTMLAnchorElement>('[data-wa-raw]').forEach((a) => {
+      const link = waLink(s.whatsapp, a.dataset.waRaw!, '');
       a.hidden = !link;
       if (link) a.href = link;
     });

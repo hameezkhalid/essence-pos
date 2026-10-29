@@ -37,10 +37,11 @@ const menuData = {
 };
 
 const business = {
-  '@type': 'Bakery',
+  '@type': ['CafeOrCoffeeShop', 'Bakery'],
   '@id': `${site.url}/#business`,
-  name: site.name,
-  description: 'Rich chocolate cakes, cheesecakes, tiramisu and freshly baked desserts in Bahria Town Phase 8, Rawalpindi.',
+  name: 'ESSENCE',
+  alternateName: 'ESSENCE Patisserie, Coffee & Dessert Lounge',
+  description: 'Cakes, cheesecakes, brownies, cookies, desserts and coffee at ESSENCE Patisserie, Coffee & Dessert Lounge in Bahria Town Phase 8, Rawalpindi.',
   url: site.url,
   image: `${site.url}/og-image.jpg`,
   logo: `${site.url}/icon-512.png`,
@@ -66,7 +67,7 @@ const business = {
 const graph = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'WebSite', '@id': `${site.url}/#website`, url: site.url, name: site.name, inLanguage: 'en-PK', publisher: { '@id': `${site.url}/#business` } },
+    { '@type': 'WebSite', '@id': `${site.url}/#website`, url: site.url, name: 'ESSENCE', inLanguage: 'en-PK', publisher: { '@id': `${site.url}/#business` } },
     business,
     ...schema,
   ],

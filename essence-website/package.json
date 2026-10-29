@@ -13,7 +13,8 @@
     "test:rules": "cd ../essence-pos && firebase emulators:exec --only firestore --project demo-essence \"node --test ../essence-website/tests/rules.test.mjs\"",
     "check": "astro check",
     "test:e2e": "node tests/e2e-order.mjs",
-    "screens": "node tests/screens.mjs screens"
+    "screens": "node tests/screens.mjs screens",
+    "test:quote": "node tests/e2e-quote.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

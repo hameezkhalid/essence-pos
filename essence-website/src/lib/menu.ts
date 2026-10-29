@@ -1,5 +1,6 @@
 // Menu types and helpers shared by pages (build time) and the browser.
 import menuJson from '../data/menu.json';
+import { productDescriptions } from '../content/copy';
 
 export interface Size { code: string; label: string; delta: number }
 export interface Option { id: string; name: string; delta: number }
@@ -19,7 +20,13 @@ export interface Product {
 }
 export interface Menu { fetchedAt: string; categories: Category[]; products: Product[]; modifierGroups: ModifierGroup[] }
 
-export const menu = menuJson as Menu;
+const raw = menuJson as Menu;
+
+/** The POS menu, with the client's approved website descriptions in place of the POS ones. */
+export const menu: Menu = {
+  ...raw,
+  products: raw.products.map((p) => ({ ...p, description: productDescriptions[p.id] ?? p.description })),
+};
 
 /** Rs 1,250 */
 export const rs = (paisa: number) => `Rs ${Math.round(paisa / 100).toLocaleString('en-US')}`;
@@ -39,9 +46,3 @@ export function fromPrice(p: Product) {
 
 export const hasOptions = (p: Product) => p.sizes.length > 1 || p.modifierGroupIds.length > 0;
 
-/** wa.me chat link to the shop with a message already written ('' when there's no number). */
-export function waLink(number: string, message: string) {
-  let d = (number || '').replace(/\D/g, '');
-  if (d.startsWith('0')) d = `92${d.slice(1)}`;
-  return d ? `https://wa.me/${d}?text=${encodeURIComponent(`Hi Essence! ${message}`)}` : '';
-}

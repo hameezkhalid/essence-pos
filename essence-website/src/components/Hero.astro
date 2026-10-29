@@ -8,7 +8,7 @@ import { hero } from '../content/copy';
 const main = photoFor('m-chocolate-cake');
 const left = photoFor('m-brownie');
 const right = photoFor('m-tiramisu');
-const ring = 'Rich chocolate · Freshly baked · ';
+const ring = 'Patisserie · Coffee · Dessert · ';
 ---
 
 <section class="hero grain" data-hero>
@@ -17,9 +17,9 @@ const ring = 'Rich chocolate · Freshly baked · ';
 
   <div class="wrap hero__grid">
     <div class="hero__copy">
+      <p class="eyebrow hero__eyebrow">{hero.eyebrow}</p>
       <h1>
-        <span class="eyebrow hero__eyebrow">Rich chocolate cakes in Bahria Town Phase 8</span>
-        <span class="display hero__title">
+        <span class="hero__title">
           {
             hero.title.map((w, i) => (
               <span class="mask">
@@ -33,8 +33,8 @@ const ring = 'Rich chocolate · Freshly baked · ';
       </h1>
       <p class="hero__sub">{hero.sub}</p>
       <div class="hero__ctas">
-        <a class="btn btn--cream" href="/menu" data-magnetic>Order for pickup <Icon name="arrow" /></a>
-        <a class="btn btn--ghost" href="#menu">See the menu</a>
+        <a class="btn btn--cream" href="/menu" data-magnetic>{hero.primary} <Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href="/menu" data-order-now>{hero.secondary}</a>
       </div>
       <p class="script hero__script">{hero.script}</p>
     </div>
@@ -44,7 +44,7 @@ const ring = 'Rich chocolate · Freshly baked · ';
         left && (
           <div class="hero__img hero__img--a" data-depth="28">
             <div class="arch">
-              <Picture src={left} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 32vw, 200px" alt="Chocolate fudge brownie" loading="eager" />
+              <Picture src={left} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 32vw, 200px" alt="ESSENCE chocolate fudge brownie" loading="eager" />
             </div>
           </div>
         )
@@ -58,7 +58,7 @@ const ring = 'Rich chocolate · Freshly baked · ';
                 formats={['avif', 'webp']}
                 widths={[280, 360]}
                 sizes="(max-width: 860px) 52vw, 340px"
-                alt="Rich chocolate cake with velvety chocolate frosting"
+                alt="ESSENCE chocolate cake"
                 loading="eager"
                 fetchpriority="high"
               />
@@ -70,7 +70,7 @@ const ring = 'Rich chocolate · Freshly baked · ';
         right && (
           <div class="hero__img hero__img--b" data-depth="36">
             <div class="arch">
-              <Picture src={right} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 30vw, 190px" alt="Tiramisu" loading="eager" />
+              <Picture src={right} formats={['avif', 'webp']} widths={[200, 360]} sizes="(max-width: 860px) 30vw, 190px" alt="ESSENCE tiramisu" loading="eager" />
             </div>
           </div>
         )
@@ -134,8 +134,7 @@ const ring = 'Rich chocolate · Freshly baked · ';
     gap: clamp(32px, 5vw, 80px);
   }
   .hero h1 {
-    display: grid;
-    gap: 22px;
+    margin-top: 22px;
     font-weight: 500;
   }
   .hero__eyebrow {
@@ -145,7 +144,9 @@ const ring = 'Rich chocolate · Freshly baked · ';
   }
   .hero__title {
     display: grid;
-    line-height: 0.98;
+    font-size: clamp(2.5rem, 5.4vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
   }
   .mask {
     display: block;
@@ -153,14 +154,13 @@ const ring = 'Rich chocolate · Freshly baked · ';
     padding-bottom: 0.08em;
   }
   .word {
-    display: inline-block;
+    display: block;
     transform: translateY(105%);
     animation: rise 1.2s var(--d) var(--ease) forwards;
   }
   .word.accent {
     font-style: italic;
     color: var(--gold);
-    padding-left: 0.5em;
   }
   @keyframes rise {
     to {

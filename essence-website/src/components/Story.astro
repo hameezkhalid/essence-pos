@@ -2,35 +2,28 @@
 import { Picture } from 'astro:assets';
 import Leaf from './Leaf.astro';
 import { photoFor } from '../lib/images';
-import { story } from '../content/copy';
+import { intro } from '../content/copy';
 const cake = photoFor('m-chocolate-cake');
 ---
 
 <section class="story" id="story" data-story>
   <div class="story__sticky">
-    <p class="story__bg" aria-hidden="true" data-story-bg>Rich chocolate</p>
+    <p class="story__bg" aria-hidden="true" data-story-bg>{intro.bg}</p>
     <div class="wrap story__grid">
       <div class="story__media">
         <div class="story__ring" aria-hidden="true"></div>
         <div class="arch story__img" data-story-img>
-          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="Slice of rich chocolate cake" loading="lazy" />}
+          {cake && <Picture src={cake} formats={['avif', 'webp']} widths={[360]} sizes="360px" alt="ESSENCE chocolate cake" loading="lazy" />}
         </div>
         <Leaf draw class="story__leaf" />
       </div>
       <div class="story__copy">
-        <p class="eyebrow">{story.kicker}</p>
-        <ol class="beats">
-          {
-            story.beats.map((b, i) => (
-              <li data-beat style={`--i:${i}`}>
-                <span class="beats__n">0{i + 1}</span>
-                <span class="beats__t">{b}</span>
-              </li>
-            ))
-          }
-        </ol>
-        <p class="lead story__body" data-beat-body>{story.body}</p>
-        <a class="link-arrow" href="/menu/chocolate-cake">Meet the chocolate cake <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+        <p class="eyebrow">{intro.kicker}</p>
+        <h2 class="beats">
+          {intro.lines.map((l) => <span class="beats__t" data-beat>{l}</span>)}
+        </h2>
+        <p class="lead story__body" data-beat-body>{intro.body}</p>
+        <a class="link-arrow" href="/menu">{intro.link} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
       </div>
     </div>
   </div>
@@ -104,28 +97,16 @@ const cake = photoFor('m-chocolate-cake');
     color: var(--olive);
   }
   .beats {
-    list-style: none;
-    padding: 0;
     margin: 26px 0 30px;
     display: grid;
-    gap: 6px;
-  }
-  .beats li {
-    display: flex;
-    align-items: baseline;
-    gap: 18px;
-  }
-  .beats__n {
-    font: 600 0.75rem/1 var(--sans);
-    letter-spacing: 0.16em;
-    color: var(--coffee);
-    translate: 0 -0.8em;
+    gap: 2px;
   }
   .beats__t {
-    font: 500 clamp(1.9rem, 4.2vw, 3.6rem) / 1.08 var(--serif);
+    display: block;
+    font: 500 clamp(2.4rem, 5.2vw, 4.4rem) / 1.04 var(--serif);
     color: var(--ink);
   }
-  .beats li:nth-child(2) .beats__t {
+  .beats__t:nth-child(2) {
     font-style: italic;
     color: var(--olive);
   }

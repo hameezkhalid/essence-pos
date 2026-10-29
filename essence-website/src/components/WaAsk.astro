@@ -3,7 +3,7 @@
 // The number comes live from the POS (or site.config), so the link is filled in by the browser.
 import Icon from './Icon.astro';
 import { site } from '../site.config';
-import { waLink } from '../lib/menu';
+import { waLink } from '../lib/wa';
 
 interface Props { message: string; label?: string; class?: string; compact?: boolean }
 const { message, label = 'Ask on WhatsApp', class: cls = '', compact = false } = Astro.props;

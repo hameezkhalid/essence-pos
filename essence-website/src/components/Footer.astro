@@ -3,8 +3,10 @@ import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
 import Social from './Social.astro';
 import { site } from '../site.config';
-import { menu, slugOf } from '../lib/menu';
-import { closing } from '../content/copy';
+import { waLink } from '../lib/wa';
+import { brand, contact, nav } from '../content/copy';
+
+const wa = waLink(site.whatsapp, 'I have a question.');
 
 const year = new Date().getFullYear();
 ---
@@ -13,22 +15,24 @@ const year = new Date().getFullYear();
   <div class="wrap footer__top">
     <div class="footer__intro">
       <p class="script footer__script">Good food · Good mood</p>
-      <p class="footer__closing">{closing}</p>
-      <a class="btn btn--cream" href="/menu">Order for pickup <Icon name="arrow" /></a>
+      <h2 class="footer__heading">{contact.title}</h2>
+      <p class="footer__closing">{contact.body}</p>
+      <div class="footer__ctas">
+        <a class="btn btn--whatsapp" data-wa="I have a question." href={wa || '#'} target="_blank" rel="noopener" hidden={!wa}><Icon name="whatsapp" /> WhatsApp Us</a>
+        <a class="btn btn--cream" href="/contact">Contact Us</a>
+        <a class="btn btn--ghost" href="/menu">Explore the Menu</a>
+      </div>
     </div>
-    <nav class="footer__col" aria-label="Desserts">
-      <h2>Desserts</h2>
-      {menu.products.slice(0, 6).map((p) => <a href={`/menu/${slugOf(p.id)}`}>{p.name}</a>)}
-      <a href="/menu">Full menu</a>
+    <nav class="footer__col" aria-label="Footer">
+      <h2>Explore</h2>
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
     </nav>
     <div class="footer__col">
       <h2>Visit</h2>
       <p data-live="address">{site.address}</p>
+      <p>{brand.location}</p>
       <p data-live="hours" hidden={!site.hours}>{site.hours}</p>
       <a href={site.mapsUrl} target="_blank" rel="noopener">Get directions</a>
-      <a data-live="whatsapp-link" href={site.whatsapp ? `https://wa.me/92${site.whatsapp.replace(/\D/g, '').replace(/^0/, '')}` : '#'} target="_blank" rel="noopener" hidden={!site.whatsapp}>
-        WhatsApp us
-      </a>
       <Social class="footer__social" />
     </div>
   </div>
@@ -37,7 +41,7 @@ const year = new Date().getFullYear();
     <Leaf variant="twin" class="footer__leaf" />
   </div>
   <div class="wrap footer__base">
-    <p>© {year} Essence · Patisserie, Coffee & Dessert · {site.area}, {site.city}</p>
+    <p>© {year} {brand.full} · {site.area}, {site.city}</p>
     <p>Pickup orders only · Pay at the counter</p>
     <p class="footer__credit">Powered by <a href="https://nibnox.com" target="_blank" rel="noopener">Nibnox (SMC-Private) Ltd.</a></p>
   </div>
@@ -61,10 +65,22 @@ const year = new Date().getFullYear();
     color: var(--gold);
     margin-bottom: 14px;
   }
+  .footer__heading {
+    font-size: clamp(2rem, 3.6vw, 2.8rem);
+    margin-bottom: 12px;
+  }
+  .footer__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer__ctas .btn--ghost {
+    color: var(--on-dark);
+  }
   .footer__closing {
-    font: 500 clamp(1.3rem, 2.2vw, 1.7rem) / 1.35 var(--serif);
-    max-width: 26ch;
-    margin-bottom: 28px;
+    color: var(--on-dark-muted);
+    max-width: 44ch;
+    margin-bottom: 26px;
   }
   .footer__col {
     display: grid;

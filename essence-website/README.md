@@ -28,7 +28,10 @@ npm run icons          # regenerate favicons + og-image.jpg from src/assets
 npm run test:rules     # Firestore rules tests on the emulator (needs Java; Android Studio's JBR works)
 ```
 
-End-to-end order test (emulator + real UI):
+Pages: home, menu, 11 item pages, Corporate & Events (`/corporate-events`, quote form → WhatsApp), About, Contact.
+Copy follows the client's brief in `reference/ESSENCE_Website_Content_Developer_Brief.docx` (no prices, no unconfirmed claims).
+
+End-to-end tests (`npm run test:quote` needs only a preview build; the order test needs the emulator):
 
 ```bash
 (cd ../essence-pos && firebase emulators:start --only firestore --project essenceisb)

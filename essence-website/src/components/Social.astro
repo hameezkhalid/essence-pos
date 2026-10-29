@@ -6,7 +6,7 @@ interface Props { class?: string; labels?: boolean }
 const { class: cls = '', labels = false } = Astro.props;
 const links = [
   { name: 'Instagram', icon: 'instagram' as const, href: site.instagramUrl, handle: `@${site.instagram}` },
-  { name: 'Facebook', icon: 'facebook' as const, href: site.facebookUrl, handle: 'Essence' },
+  { name: 'Facebook', icon: 'facebook' as const, href: site.facebookUrl, handle: 'ESSENCE' },
 ];
 ---
 
@@ -14,7 +14,7 @@ const links = [
   {
     links.map((l) => (
       <li>
-        <a href={l.href} target="_blank" rel="noopener" aria-label={`Essence on ${l.name}`}>
+        <a href={l.href} target="_blank" rel="noopener" aria-label={`ESSENCE on ${l.name}`}>
           <Icon name={l.icon} />
           {labels && <span>{l.name}</span>}
         </a>

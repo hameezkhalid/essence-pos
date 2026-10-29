@@ -44,9 +44,9 @@ const bg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org
   <defs><radialGradient id="g" cx="72%" cy="40%" r="80%"><stop offset="0" stop-color="#3a2418"/><stop offset=".65" stop-color="#22150e"/></radialGradient></defs>
   <rect width="100%" height="100%" fill="url(#g)"/>
   <text x="70" y="250" font-family="Playfair Display, Georgia, serif" font-size="96" fill="#f6efe2">Essence</text>
-  <text x="74" y="306" font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="6" fill="#d9b77e">PATISSERIE · COFFEE · DESSERT</text>
-  <text x="70" y="400" font-family="Playfair Display, Georgia, serif" font-style="italic" font-size="46" fill="#f6efe2">Beautifully indulgent.</text>
-  <text x="72" y="452" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#c9bba5">Rich chocolate cakes · Bahria Town Phase 8</text>
+  <text x="74" y="306" font-family="Helvetica, Arial, sans-serif" font-size="17" letter-spacing="5" fill="#d9b77e">PATISSERIE · COFFEE · DESSERT LOUNGE</text>
+  <text x="70" y="400" font-family="Playfair Display, Georgia, serif" font-style="italic" font-size="46" fill="#f6efe2">A Little Taste of Happiness</text>
+  <text x="72" y="452" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#c9bba5">Coffee, cakes &amp; desserts · Bahria Town Phase 8</text>
 </svg>`);
 await sharp(bg)
   .composite([

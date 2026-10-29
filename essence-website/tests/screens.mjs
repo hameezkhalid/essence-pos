@@ -11,9 +11,12 @@ await mkdir(outDir, { recursive: true });
 const browser = await puppeteer.launch({ executablePath: chrome, headless: true, args: ['--hide-scrollbars'] });
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 } };
 const plan = [
-  { path: '/', stops: [0, 0.9, 1.5, 2.1, 2.8, 3.6, 4.6, 5.6, 6.6, 7.6, 8.6, 9.6] },
-  { path: '/menu', stops: [0, 1, 2, 3, 4] },
-  { path: '/menu/chocolate-cake', stops: [0, 1] },
+  { path: '/', stops: [0, 1.5, 2.8, 3.6, 4.6, 5.6, 6.6, 7.6, 8.6, 9.6] },
+  { path: '/menu', stops: [0, 1, 2] },
+  { path: '/menu/chocolate-cake', stops: [0] },
+  { path: '/corporate-events', stops: [0, 1, 2, 3, 4, 5] },
+  { path: '/about', stops: [0, 1] },
+  { path: '/contact', stops: [0, 1] },
 ];
 
 for (const [name, vp] of Object.entries(sizes)) {

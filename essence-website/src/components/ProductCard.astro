@@ -28,7 +28,7 @@ const slug = slugOf(p.id);
         <span class="card__fallback">{p.name.slice(0, 1)}</span>
       )
     }
-    <span class="chip chip--sold card__sold">Sold out today</span>
+    <span class="chip chip--sold card__sold">Currently unavailable</span>
   </a>
   <div class="card__body">
     <h3><a href={`/menu/${slug}`}>{p.name}</a></h3>

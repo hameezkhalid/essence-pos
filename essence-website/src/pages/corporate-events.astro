@@ -1,0 +1,548 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Leaf from '../components/Leaf.astro';
+import { site } from '../site.config';
+import { photoFor } from '../lib/images';
+import { waLink } from '../lib/wa';
+import { corporate, seo } from '../content/copy';
+
+const wa = waLink(site.whatsapp, corporate.whatsapp, '');
+const art = [photoFor('m-og-cookies'), photoFor('m-chocolate-cake'), photoFor('m-brownie')];
+const schema = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
+      { '@type': 'ListItem', position: 2, name: corporate.title, item: `${site.url}/corporate-events` },
+    ],
+  },
+];
+---
+
+<Base title={seo.corporate.title} description={seo.corporate.description} path="/corporate-events" schema={schema} dark>
+  <section class="ce-hero grain">
+    <div class="ce-hero__glow" aria-hidden="true"></div>
+    <Leaf draw class="ce-hero__leaf" />
+    <div class="wrap ce-hero__grid">
+      <div class="ce-hero__copy">
+        <h1 class="ce-hero__title">{corporate.title}</h1>
+        <p class="ce-hero__headline">{corporate.headline}</p>
+        <p class="ce-hero__body">{corporate.body}</p>
+        <div class="ce-hero__ctas">
+          <a class="btn btn--cream" href="#quote" data-magnetic>{corporate.primary} <Icon name="arrow" /></a>
+          <a class="btn btn--whatsapp" data-wa-raw={corporate.whatsapp} href={wa || '#'} target="_blank" rel="noopener" hidden={!wa}><Icon name="whatsapp" /> {corporate.secondary}</a>
+        </div>
+        <p class="ce-hero__note"><Icon name="check" /> {corporate.note}</p>
+      </div>
+      <div class="ce-hero__art" aria-hidden="true">
+        {
+          art.map(
+            (photo, i) =>
+              photo && (
+                <div class={`ce-hero__img ce-hero__img--${i}`} data-depth={[30, 14, 24][i]}>
+                  <div class="arch">
+                    <Picture src={photo} formats={['avif', 'webp']} widths={[240, 360]} sizes="(max-width: 860px) 40vw, 260px" alt="" loading="eager" />
+                  </div>
+                </div>
+              ),
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <div class="ce-sections">
+    {
+      corporate.sections.map((sec, i) => {
+        const photo = photoFor(sec.product);
+        return (
+          <section class:list={['ce-row', { 'ce-row--flip': i % 2 === 1 }]} id={sec.id} aria-labelledby={`h-${sec.id}`}>
+            <div class="wrap ce-row__grid">
+              <div class="ce-row__media" data-reveal="scale">
+                <span class="ce-row__n" aria-hidden="true">0{i + 1}</span>
+                <div class="arch">
+                  {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360]} sizes="(max-width: 860px) 70vw, 340px" alt="" loading="lazy" />}
+                </div>
+              </div>
+              <div class="ce-row__copy">
+                <p class="eyebrow" data-reveal>{sec.kicker}</p>
+                <h2 class="h2" id={`h-${sec.id}`} data-reveal>{sec.title}</h2>
+                <p class="lead" data-reveal>{sec.body}</p>
+                <ul class="chips" data-reveal>
+                  {sec.bullets.map((b) => (
+                    <li>
+                      <Leaf variant="twin" class="chips__leaf" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <section class="section quote textured" id="quote">
+    <Leaf draw class="sprig sprig--tl" />
+    <Leaf draw class="sprig sprig--br" />
+    <div class="wrap quote__grid">
+      <header class="quote__head">
+        <p class="eyebrow" data-reveal>{corporate.form.kicker}</p>
+        <h2 class="h2" data-reveal>{corporate.form.title}</h2>
+        <p class="lead" data-reveal>{corporate.form.intro}</p>
+        <p class="quote__note" data-reveal><Icon name="whatsapp" /> {corporate.note}</p>
+      </header>
+
+      <div class="quote__card" data-reveal>
+        <form class="qform" data-quote novalidate>
+          <label class="f f--half">
+            <span>Full name</span>
+            <input name="name" autocomplete="name" required maxlength="60" />
+          </label>
+          <label class="f f--half">
+            <span>Company / organisation <em>(optional)</em></span>
+            <input name="company" autocomplete="organization" maxlength="80" />
+          </label>
+          <label class="f f--half">
+            <span>Phone number / WhatsApp</span>
+            <input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0300 1234567" required maxlength="18" />
+          </label>
+          <label class="f f--half">
+            <span>Email address <em>(optional)</em></span>
+            <input name="email" type="email" autocomplete="email" maxlength="80" />
+          </label>
+          <label class="f f--half">
+            <span>Enquiry type</span>
+            <select name="type" required>
+              <option value="" selected disabled>Choose one</option>
+              {corporate.form.types.map((t) => <option>{t}</option>)}
+            </select>
+          </label>
+          <label class="f f--half">
+            <span>Event or delivery date</span>
+            <input name="date" type="date" />
+          </label>
+          <label class="f f--half">
+            <span>Approximate number of guests or quantity</span>
+            <input name="guests" inputmode="numeric" maxlength="40" placeholder="e.g. 40 guests" />
+          </label>
+          <label class="f f--half">
+            <span>Location / area</span>
+            <input name="location" maxlength="80" placeholder="e.g. Bahria Town Phase 7" />
+          </label>
+          <label class="f">
+            <span>Products or services required</span>
+            <input name="items" maxlength="160" placeholder="e.g. brownies, cookies, a celebration cake" />
+          </label>
+          <label class="f">
+            <span>Additional details</span>
+            <textarea name="details" rows="3" maxlength="600"></textarea>
+          </label>
+          <p class="qform__error" data-quote-error role="alert" hidden></p>
+          <button class="btn qform__submit" type="submit"><Icon name="whatsapp" /> {corporate.form.submit}</button>
+        </form>
+
+        <div class="qdone" data-quote-done hidden tabindex="-1">
+          <svg class="qdone__ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="54" pathLength="1"></circle>
+            <path d="M40 62 L54 76 L82 46" pathLength="1"></path>
+          </svg>
+          <h3 data-quote-done-title>{corporate.form.success}</h3>
+          <p data-quote-done-body>{corporate.form.successBody}</p>
+          <a class="btn btn--whatsapp" data-quote-open href="#" target="_blank" rel="noopener"><Icon name="whatsapp" /> Open WhatsApp again</a>
+          <button class="link-btn" type="button" data-quote-reset>Send another enquiry</button>
+        </div>
+
+        <div class="qdone" data-quote-blocked hidden tabindex="-1">
+          <h3>One more step</h3>
+          <p>Your enquiry is ready. Tap below to open WhatsApp and send it to our team.</p>
+          <a class="btn btn--whatsapp" data-quote-blocked-open href="#" target="_blank" rel="noopener"><Icon name="whatsapp" /> Send on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { initQuote } from '../scripts/quote';
+  initQuote();
+</script>
+
+<style>
+  .ce-hero {
+    position: relative;
+    min-height: max(640px, 92svh);
+    display: flex;
+    align-items: center;
+    background: radial-gradient(120% 90% at 75% 40%, var(--cocoa-2) 0%, var(--cocoa) 62%);
+    color: var(--on-dark);
+    padding-block: calc(var(--nav-h) + 40px) 80px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .ce-hero__glow {
+    position: absolute;
+    width: 70vmax;
+    aspect-ratio: 1;
+    right: -24vmax;
+    top: -18vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(201 147 102 / 24%), transparent 62%);
+    z-index: -1;
+  }
+  .ce-hero :global(.ce-hero__leaf) {
+    position: absolute;
+    left: -30px;
+    bottom: 30px;
+    width: clamp(150px, 20vw, 280px);
+    color: rgb(217 183 126 / 38%);
+    transform: rotate(-8deg);
+    z-index: -1;
+  }
+  .ce-hero__grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+  }
+  .ce-hero__copy {
+    display: grid;
+    gap: 20px;
+  }
+  .ce-hero__title {
+    font-size: clamp(2.5rem, 5.6vw, 5rem);
+    animation: rise-in 1.1s 0.1s var(--ease) both;
+  }
+  .ce-hero__headline {
+    font: italic 500 clamp(1.5rem, 2.6vw, 2.2rem) / 1.2 var(--serif);
+    color: var(--gold);
+    animation: rise-in 1.1s 0.25s var(--ease) both;
+  }
+  .ce-hero__body {
+    color: var(--on-dark-muted);
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    max-width: 52ch;
+    animation: rise-in 1.1s 0.4s var(--ease) both;
+  }
+  .ce-hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+    animation: rise-in 1.1s 0.55s var(--ease) both;
+  }
+  .ce-hero__note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    color: var(--on-dark-muted);
+    max-width: 56ch;
+    animation: rise-in 1.1s 0.7s var(--ease) both;
+  }
+  .ce-hero__note :global(svg) {
+    width: 18px;
+    height: 18px;
+    color: var(--gold);
+    flex: none;
+    margin-top: 1px;
+  }
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  .ce-hero__art {
+    position: relative;
+    height: clamp(380px, 42vw, 540px);
+  }
+  .ce-hero__img {
+    position: absolute;
+    animation: rise-in 1.4s var(--ease) both;
+  }
+  .ce-hero__img .arch {
+    aspect-ratio: 4 / 5;
+    background: var(--cocoa-3);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 70%);
+    animation: float 7s ease-in-out infinite alternate;
+  }
+  .ce-hero__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ce-hero__img--1 {
+    width: 54%;
+    left: 23%;
+    top: 0;
+    animation-delay: 0.15s;
+  }
+  .ce-hero__img--1 .arch {
+    aspect-ratio: 3 / 4;
+    outline: 1px solid rgb(217 183 126 / 35%);
+    outline-offset: 10px;
+  }
+  .ce-hero__img--0 {
+    width: 34%;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    animation-delay: 0.35s;
+  }
+  .ce-hero__img--2 {
+    width: 31%;
+    right: 0;
+    bottom: 12%;
+    z-index: 2;
+    animation-delay: 0.5s;
+  }
+  .ce-hero__img--0 .arch {
+    animation-delay: -2s;
+  }
+  .ce-hero__img--2 .arch {
+    animation-delay: -4s;
+  }
+  @keyframes float {
+    to {
+      translate: 0 -12px;
+    }
+  }
+
+  .ce-sections {
+    background: var(--cream);
+  }
+  .ce-row {
+    padding-block: clamp(70px, 9vw, 120px);
+  }
+  .ce-row + .ce-row {
+    border-top: 1px solid var(--sand);
+  }
+  .ce-row__grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(36px, 6vw, 96px);
+    align-items: center;
+  }
+  .ce-row--flip .ce-row__media {
+    order: 2;
+  }
+  .ce-row__media {
+    position: relative;
+    justify-self: center;
+    width: min(340px, 72vw);
+  }
+  .ce-row__media .arch {
+    aspect-ratio: 4 / 5;
+    box-shadow: var(--shadow);
+  }
+  .ce-row__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ce-row__n {
+    position: absolute;
+    top: -0.45em;
+    left: -0.35em;
+    z-index: 1;
+    font: italic 500 clamp(4rem, 8vw, 6.5rem) / 1 var(--serif);
+    color: rgb(138 90 54 / 22%);
+  }
+  .ce-row__copy {
+    display: grid;
+    gap: 18px;
+  }
+  .chips {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chips li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 10px 12px;
+    border-radius: 999px;
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--sand);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .chips :global(.chips__leaf) {
+    width: 20px;
+    color: var(--olive);
+  }
+
+  .quote__grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(36px, 5vw, 80px);
+    align-items: start;
+  }
+  .quote__head {
+    display: grid;
+    gap: 18px;
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+  }
+  .quote__note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .quote__note :global(svg) {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    color: #1f8f4e;
+  }
+  .quote__card {
+    background: var(--paper);
+    border-radius: 28px;
+    padding: clamp(22px, 3.4vw, 40px);
+    box-shadow: 0 30px 70px -40px rgb(43 33 24 / 45%), inset 0 0 0 1px var(--sand);
+  }
+  .qform {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 18px;
+  }
+  .f {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .f--half {
+    grid-column: span 1;
+  }
+  .f em {
+    font-style: normal;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .f input,
+  .f select,
+  .f textarea {
+    font: 400 1rem/1.4 var(--sans);
+    padding: 13px 15px;
+    border-radius: 14px;
+    border: 1.5px solid var(--sand);
+    background: var(--cream);
+    color: var(--ink);
+    width: 100%;
+    min-height: 50px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+  }
+  .f select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23665c4e' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m3 5 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+  .f input:focus,
+  .f select:focus,
+  .f textarea:focus {
+    outline: none;
+    border-color: var(--olive);
+    box-shadow: 0 0 0 4px rgb(78 87 38 / 14%);
+  }
+  .f [aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  .qform__error {
+    grid-column: 1 / -1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f6e1dc;
+    color: var(--danger);
+    font-size: 0.88rem;
+  }
+  .qform__submit {
+    grid-column: 1 / -1;
+    --bg: #1f8f4e;
+    margin-top: 6px;
+  }
+  .qdone {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 14px;
+    padding: 24px 0;
+  }
+  .qdone:focus {
+    outline: none;
+  }
+  .qdone h3 {
+    font-size: 1.9rem;
+  }
+  .qdone p {
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  .qdone__ring {
+    width: 88px;
+    height: 88px;
+  }
+  .qdone__ring circle,
+  .qdone__ring path {
+    fill: none;
+    stroke: var(--olive);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .qdone.is-in .qdone__ring circle {
+    transition: stroke-dashoffset 0.9s var(--ease);
+    stroke-dashoffset: 0;
+  }
+  .qdone.is-in .qdone__ring path {
+    transition: stroke-dashoffset 0.5s 0.7s var(--ease);
+    stroke-dashoffset: 0;
+  }
+  .link-btn {
+    border: 0;
+    background: none;
+    color: var(--olive);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 860px) {
+    .ce-hero__grid,
+    .ce-row__grid,
+    .quote__grid {
+      grid-template-columns: 1fr;
+    }
+    .ce-hero__art {
+      height: min(92vw, 420px);
+    }
+    .ce-row--flip .ce-row__media {
+      order: 0;
+    }
+    .quote__head {
+      position: static;
+    }
+  }
+  @media (max-width: 560px) {
+    .f--half {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -3,8 +3,8 @@
 // and replace these values in the browser.
 
 export const site = {
-  name: 'Essence',
-  tagline: 'Patisserie · Coffee · Dessert',
+  name: 'ESSENCE',
+  tagline: 'Patisserie, Coffee & Dessert Lounge',
   url: 'https://essenceisb.web.app', // TODO: custom domain when the client has one
   locale: 'en_PK',
 

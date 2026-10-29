@@ -1,49 +1,88 @@
 ---
+// Location & contact block: "Find ESSENCE" on the home page, "Get in Touch" (as the page's H1) on /contact.
 import Icon from './Icon.astro';
 import Social from './Social.astro';
 import { site } from '../site.config';
-import { visit } from '../content/copy';
+import { brand, contact, visit } from '../content/copy';
+import { waLink } from '../lib/wa';
+
+interface Props { variant?: 'home' | 'contact' }
+const { variant = 'home' } = Astro.props;
+const page = variant === 'contact';
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&z=16&output=embed`;
+const wa = waLink(site.whatsapp, 'I have a question.');
+const Heading = page ? 'h1' : 'h2';
 ---
 
-<section class="visit section" id="visit">
+<section class:list={['visit', page ? 'visit--page' : 'section']} id={page ? 'contact' : 'visit'}>
   <div class="wrap visit__grid">
     <div class="visit__copy">
-      <p class="eyebrow" data-reveal>Visit Essence</p>
-      <h2 class="visit__title" data-reveal>{visit.title} <em class="accent">{visit.sub}</em></h2>
+      <p class="eyebrow" data-reveal>{page ? 'Contact' : visit.kicker}</p>
+      <Heading class:list={['visit__title', { display: page }]} data-reveal>{page ? contact.title : visit.title}</Heading>
+      <p class="lead" data-reveal>{page ? contact.body : visit.body}</p>
       <ul class="facts" data-reveal>
-        <li><Icon name="pin" /><span data-live="address">{site.address}</span></li>
+        <li>
+          <Icon name="pin" />
+          <span>
+            <span data-live="address">{site.address}</span>
+            <small class="facts__line">{brand.location}</small>
+          </span>
+        </li>
         <li data-live-row="hours" hidden={!site.hours}><Icon name="clock" /><span data-live="hours">{site.hours}</span></li>
         <li data-live-row="whatsapp" hidden={!site.whatsapp}><Icon name="whatsapp" /><span data-live="whatsapp">{site.whatsapp}</span></li>
       </ul>
       <div class="visit__ctas" data-reveal>
-        <a class="btn" href={site.mapsUrl} target="_blank" rel="noopener" data-magnetic><Icon name="pin" /> Get directions</a>
-        <a class="btn btn--whatsapp" data-live="whatsapp-link" href="#" target="_blank" rel="noopener" hidden={!site.whatsapp}><Icon name="whatsapp" /> WhatsApp us</a>
+        <a class="btn btn--whatsapp" data-wa="I have a question." href={wa || '#'} target="_blank" rel="noopener" hidden={!wa}><Icon name="whatsapp" /> WhatsApp Us</a>
+        {
+          page ? (
+            <a class="btn" href="/menu" data-magnetic>
+              Explore the Menu <Icon name="arrow" />
+            </a>
+          ) : (
+            <a class="btn" href="/contact" data-magnetic>
+              {visit.button} <Icon name="arrow" />
+            </a>
+          )
+        }
+        <a class="btn btn--ghost" href={site.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" /> Get directions</a>
       </div>
+      {
+        page && (
+          <p class="visit__events" data-reveal>
+            Planning an office order or a celebration? <a href="/corporate-events">Corporate & events enquiries</a>
+          </p>
+        )
+      }
       <div class="visit__social" data-reveal>
         <p class="eyebrow">Follow along</p>
         <Social labels class="visit__social-links" />
       </div>
     </div>
     <div class="visit__map arch" data-reveal="scale">
-      <iframe title="Map to Essence, Bahria Town Phase 8" src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <iframe title="Map showing ESSENCE, Bahria Town Phase 8" src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
   </div>
 </section>
 
 <style>
+  .visit--page {
+    padding: calc(var(--nav-h) + clamp(40px, 6vw, 90px)) 0 clamp(80px, 10vw, 130px);
+  }
   .visit__grid {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     gap: clamp(40px, 6vw, 96px);
     align-items: center;
   }
-  .visit__title {
-    font-size: clamp(2rem, 4vw, 3.3rem);
-  }
   .visit__copy {
     display: grid;
-    gap: 26px;
+    gap: 24px;
+  }
+  .visit__title {
+    font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  }
+  .visit__title.display {
+    font-size: clamp(2.6rem, 6vw, 5rem);
   }
   .facts {
     list-style: none;
@@ -51,23 +90,42 @@ const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery
     margin: 0;
     display: grid;
     gap: 14px;
-    font-size: 1.05rem;
+    font-size: 1.02rem;
   }
   .facts li {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
+  }
+  .facts li > span {
+    display: grid;
+    gap: 2px;
+  }
+  .facts__line {
+    font-size: 0.82rem;
+    color: var(--muted);
   }
   .facts :global(svg) {
     width: 22px;
     height: 22px;
     color: var(--olive);
     flex: none;
+    margin-top: 2px;
   }
   .visit__ctas {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+  .visit__ctas .btn--ghost {
+    color: var(--olive);
+  }
+  .visit__events {
+    color: var(--muted);
+  }
+  .visit__events a {
+    color: var(--olive);
+    font-weight: 600;
   }
   .visit__social {
     display: grid;

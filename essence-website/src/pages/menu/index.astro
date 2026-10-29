@@ -11,7 +11,7 @@ const schema = [
   {
     '@type': 'Menu',
     '@id': `${site.url}/menu#menu`,
-    name: 'Essence dessert menu',
+    name: 'ESSENCE menu',
     url: `${site.url}/menu`,
     inLanguage: 'en-PK',
     hasMenuSection: cats.map((c) => ({
@@ -43,8 +43,8 @@ const schema = [
   <section class="menu-hero">
     <Leaf draw class="menu-hero__leaf" />
     <div class="wrap">
-      <p class="eyebrow">Handcrafted · Freshly baked · Always delicious</p>
-      <h1 class="display">The <em class="accent">dessert</em> menu</h1>
+      <p class="eyebrow">{menuIntro.eyebrow}</p>
+      <h1 class="display">Our <em class="accent">menu</em></h1>
       <p class="lead">{menuIntro.body[0]}</p>
       <nav class="jump" aria-label="Categories">
         {cats.map((c) => <a href={`#${c.id.replace(/^cat-/, '')}`}>{c.name}</a>)}
@@ -64,8 +64,9 @@ const schema = [
     <div class="wrap menu-more__grid">
       <div data-reveal>
         <p class="eyebrow">Pickup in Bahria Town Phase 8</p>
-        <h2 class="h2">Order ahead, <em class="accent">collect fresh.</em></h2>
+        <h2 class="h2">Order ahead, <em class="accent">collect in store.</em></h2>
         <p class="lead">{menuIntro.body[1]}</p>
+        <p class="menu-more__events">Ordering for an office meeting or a celebration? <a href="/corporate-events">Corporate & events enquiries</a></p>
       </div>
       <div class="faq" data-reveal>
         {
@@ -140,6 +141,13 @@ const schema = [
   .menu-more__grid > div:first-child {
     display: grid;
     gap: 22px;
+  }
+  .menu-more__events {
+    color: var(--muted);
+  }
+  .menu-more__events a {
+    color: var(--olive);
+    font-weight: 600;
   }
   .faq {
     display: grid;

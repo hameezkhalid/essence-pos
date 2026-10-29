@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Visit from '../components/Visit.astro';
+import { site } from '../site.config';
+import { contact, seo } from '../content/copy';
+
+const schema = [
+  { '@type': 'ContactPage', name: contact.title, url: `${site.url}/contact`, about: { '@id': `${site.url}/#business` } },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'Contact', item: `${site.url}/contact` },
+    ],
+  },
+];
+---
+
+<Base title={seo.contact.title} description={seo.contact.description} path="/contact" schema={schema}>
+  <Visit variant="contact" />
+</Base>

@@ -2,29 +2,26 @@
 import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
 import Social from './Social.astro';
+import WaAsk from './WaAsk.astro';
+import { nav as links } from '../content/copy';
 
 interface Props { dark?: boolean }
 const { dark = false } = Astro.props;
-const here = Astro.url.pathname;
-const links = [
-  { href: '/menu', label: 'Menu' },
-  { href: '/#moments', label: 'Moments' },
-  { href: '/#pickup', label: 'Pickup' },
-  { href: '/#visit', label: 'Visit' },
-];
+const here = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const current = (href: string) => (href === '/' ? here === '/' : here === href || here.startsWith(`${href}/`));
 ---
 
 <header class:list={['nav', { 'nav--dark': dark }]} data-nav>
   <div class="nav__inner">
-    <a class="brand" href="/" aria-label="Essence home">
+    <a class="brand" href="/" aria-label="ESSENCE home">
       <span class="brand__word">Essence</span>
       <Leaf variant="twin" class="brand__leaf" />
     </a>
     <nav class="nav__links" aria-label="Main">
-      {links.map((l) => <a href={l.href} aria-current={here === l.href ? 'page' : undefined}>{l.label}</a>)}
+      {links.map((l) => <a href={l.href} aria-current={current(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
     <div class="nav__actions">
-      <a class="btn btn--sm nav__cta" href="/menu">Order pickup</a>
+      <a class="btn btn--sm nav__cta" href="/menu">Order Now</a>
       <button class="cart-btn" type="button" data-open-cart aria-label="Open cart">
         <Icon name="bag" />
         <span class="cart-btn__count" data-cart-count hidden>0</span>
@@ -38,8 +35,12 @@ const links = [
 
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
   <nav aria-label="Mobile">
-    {links.map((l, i) => <a href={l.href} style={`--i:${i}`}>{l.label}</a>)}
+    {links.map((l, i) => <a href={l.href} style={`--i:${i}`} aria-current={current(l.href) ? 'page' : undefined}>{l.label}</a>)}
   </nav>
+  <div class="mobile-menu__actions">
+    <a class="btn btn--cream" href="/menu">Order Now</a>
+    <WaAsk message="I have a question." label="WhatsApp Us" class="mobile-menu__wa" />
+  </div>
   <div>
     <p class="script mobile-menu__script">Sweet moments, better here</p>
     <Social labels class="mobile-menu__social" />
@@ -98,7 +99,7 @@ const links = [
   }
   .nav__links {
     display: flex;
-    gap: 34px;
+    gap: 28px;
   }
   .nav__links a {
     position: relative;
@@ -227,15 +228,15 @@ const links = [
     display: grid;
     gap: 6px;
   }
-  .mobile-menu a {
-    font: 500 clamp(2.6rem, 12vw, 3.6rem) / 1.15 var(--serif);
+  .mobile-menu nav a {
+    font: 500 clamp(2.1rem, 10vw, 3.2rem) / 1.15 var(--serif);
     text-decoration: none;
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 0.5s, transform 0.6s var(--ease);
     transition-delay: calc(0.15s + var(--i) * 0.06s);
   }
-  .mobile-menu.is-open a {
+  .mobile-menu.is-open nav a {
     opacity: 1;
     transform: none;
   }
@@ -255,7 +256,20 @@ const links = [
     backdrop-filter: none;
   }
 
-  @media (max-width: 860px) {
+  .mobile-menu__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .mobile-menu__actions :global(.mobile-menu__wa) {
+    min-height: 52px;
+    padding: 0 20px;
+    font-size: 0.95rem;
+  }
+  .mobile-menu nav a[aria-current='page'] {
+    color: var(--gold);
+  }
+  @media (max-width: 1080px) {
     .nav__links,
     .nav__cta {
       display: none;

@@ -1,25 +1,25 @@
 ---
 import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
 import Leaf from './Leaf.astro';
 import { photoFor } from '../lib/images';
-import { slugOf } from '../lib/menu';
-import { moments } from '../content/copy';
+import { gatherings } from '../content/copy';
 ---
 
-<section class="moments section" id="moments">
+<section class="moments section" id="gatherings">
   <Leaf draw class="moments__leaf" />
   <div class="wrap">
     <header class="section-head moments__head">
-      <p class="eyebrow" data-reveal>Every occasion</p>
-      <h2 class="h2" data-reveal>Made for your <em class="accent">sweetest</em> moments</h2>
-      <p class="lead" data-reveal>{moments.intro}</p>
+      <p class="eyebrow" data-reveal>{gatherings.kicker}</p>
+      <h2 class="h2" data-reveal>{gatherings.title}</h2>
+      <p class="lead" data-reveal>{gatherings.body}</p>
     </header>
     <div class="moments__grid">
       {
-        moments.tiles.map((t, i) => {
+        gatherings.tiles.map((t, i) => {
           const photo = photoFor(t.product);
           return (
-            <a class="tile" href={`/menu/${slugOf(t.product)}`} data-tilt data-reveal style={`--i:${i}`}>
+            <a class="tile" href="/corporate-events" data-tilt data-reveal style={`--i:${i}`}>
               <div class="tile__media arch">
                 {photo && <Picture src={photo} formats={['avif', 'webp']} widths={[360]} sizes="(max-width: 760px) 80vw, 360px" alt="" loading="lazy" />}
               </div>
@@ -30,6 +30,9 @@ import { moments } from '../content/copy';
         })
       }
     </div>
+    <p class="moments__cta" data-reveal>
+      <a class="btn" href="/corporate-events" data-magnetic>{gatherings.button} <Icon name="arrow" /></a>
+    </p>
   </div>
 </section>
 
@@ -53,6 +56,11 @@ import { moments } from '../content/copy';
   }
   .moments__head .lead {
     text-align: center;
+  }
+  .moments__cta {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(48px, 6vw, 80px);
   }
   .moments__grid {
     display: grid;
